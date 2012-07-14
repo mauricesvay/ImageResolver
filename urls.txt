@@ -1,0 +1,53 @@
+//Remove query string
+http://cdn.shopify.com/s/files/1/0061/5002/products/BRIANKAPPEL_DESTRUCTO_src.jpg?109753
+http://cdn.shopify.com/s/files/1/0061/5002/products/Chelsea_Violet_Javier_-_Bowie_on_Mars.jpg?109800
+http://s3.amazonaws.com/ksr/assets/000/026/217/2eaa7231181567614e2db9cc541749e0_large.jpg?1339487248
+
+//Make HEAD request
+http://ep.yimg.com/ca/I/yhst-72401798943265_2219_532792
+
+//get HTML, find image with large width/height
+http://flightaware.com/photos/view/102720-e813ccd95eec9b216ed1dc427d8254c5c6f98bfb/staffpicksweek/sort/date/page/1
+
+http://funnyblogloko.blogspot.com/2012/07/walking-at-altitude-of-177-meters.html
+http://imgfave.com/view/2460373
+
+http://imgme.org/phk3n
+
+// http://api.imgur.com/2/album/:ID.json
+http://imgur.com/a/2vkoD
+http://imgur.com/a/4tPHG
+http://imgur.com/a/7xH7I
+http://imgur.com/a/B00vd
+http://imgur.com/a/DGBlE#0
+http://imgur.com/a/f58a5
+http://imgur.com/a/gm8wm
+http://imgur.com/a/nI21Z
+http://imgur.com/a/pbBNB
+http://imgur.com/a/scPk9
+http://imgur.com/a/UMZvR
+http://imgur.com/a/xcbrU
+http://imgur.com/LAnde
+
+//Remove :large
+https://p.twimg.com/AxsvrlcCEAEoPOt.jpg:large
+
+http://josephrye.wordpress.com/
+http://wielding-power/
+
+//Flickr API
+// select * from flickr.photos.sizes where photo_id=7563421200 and api_key="5e377cde29302d5ecb8045f3175e7501"
+//http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20flickr.photos.sizes%20where%20photo_id%3D7563421200%20and%20api_key%3D%225e377cde29302d5ecb8045f3175e7501%22&format=json&diagnostics=true&callback=cbfunc
+//http://www.flickr.com/services/api/response.json.html
+http://www.flickr.com/photos/28194304@N03/7563421200/in/photostream
+http://www.flickr.com/photos/40122107@N07/7520297916/
+http://www.flickr.com/photos/48583416@N06/7563633872/
+http://www.flickr.com/photos/dariustwin/6964437507/in/photostream/
+http://www.flickr.com/photos/jjwit818/7563669314/in/photostream
+http://www.flickr.com/photos/kalexanderson/7557139112/in/photostream
+http://www.flickr.com/photos/maxwalton/6825021713/
+http://www.flickr.com/photos/slumbernaut/4692996682/
+
+http://www.juanosborne.com/2012/07/tetris-nightmare/
+http://www.wired.com/rawfile/2012/07/arctic-sea-creatures/
+https://p.twimg.com/AxsvrlcCEAEoPOt.jpg:large
