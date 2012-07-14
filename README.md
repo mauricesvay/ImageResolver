@@ -4,6 +4,8 @@ ImageResolver.js
 ImageResolver.js does its best to determine the main image on a URL **without
 loading all images**.
 
+**Demo** : [http://mauricesvay.github.com/ImageResolver/](http://mauricesvay.github.com/ImageResolver/)
+
 Works without any extra request with:
 
 * image URLs
