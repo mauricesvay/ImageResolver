@@ -16,7 +16,8 @@ Works with an additional request:
 
 * imgur.com album pages
 * flickr.com photo pages (requires an API key)
-* any other webpage (requires a CORS proxy)
+* any other webpage with Opengraph tags (requires a proxy)
+* any other webpage by looking at `<img>` tags (requires a proxy)
 
 ImageResolvers.js compatibility can be extended to more sites by writing plugins.
 
