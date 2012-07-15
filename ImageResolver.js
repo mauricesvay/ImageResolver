@@ -231,6 +231,44 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
             }
             clbk(null);
             return;
+        },
+        error: function() {
+            clbk(null);
+            return;
+        }
+    });
+};
+
+/**
+ * Opengraph meta tags
+ */
+function OpengraphResolver() {
+}
+OpengraphResolver.prototype.resolve = function(url, clbk) {
+    var self = this;
+    //@FIXME: prevent multiple request. Should reuse previous one.
+    $.ajax({
+        url : url,
+        method: 'GET',
+        dataType: 'text',
+        success: function(html) {
+            var meta = html.match(/<meta([^>]*)>/g) || [];
+            var tag;
+            var image = null;
+            for (var i=0,l=meta.length; i<l; i++) {
+                //@FIXME: remove dependency on WebpageResolver
+                tag = WebpageResolver.prototype._parseTag(meta[i]);
+                if (tag.attributes.property && tag.attributes.property === 'og:image' && tag.attributes.content) {
+                    image = tag.attributes.content;
+                    break;
+                }
+            }
+            clbk(image);
+            return;
+        },
+        error: function() {
+            clbk(null);
+            return;
         }
     });
 };
