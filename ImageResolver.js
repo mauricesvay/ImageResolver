@@ -131,7 +131,7 @@ function InstagramResolver() {
 }
 InstagramResolver.prototype.resolve = function(url, clbk) {
     var id = url.match(/http:\/\/instagram.com\/p\/([^\/]+)/);
-    if (id.length > 1) {
+    if (id && id.length > 1) {
         url = 'http://instagram.com/p/' + id[1] + '/media/?size=l';
         clbk(url);
         return;
