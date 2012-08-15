@@ -51,7 +51,7 @@ function FileExtensionResolver() {
 }
 FileExtensionResolver.prototype.resolve = function(url, clbk) {
     var pathname = URI(url).pathname();
-    if (pathname.match(/(png|jpg|jpeg|gif|bmp)$/i)) {
+    if (pathname.match(/(png|jpg|jpeg|gif|bmp|svg)$/i)) {
         clbk(url);
         return;
     }
