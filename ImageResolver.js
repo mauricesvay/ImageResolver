@@ -125,6 +125,21 @@ NineGagResolver.prototype.resolve = function(url, clbk) {
 };
 
 /**
+ * Instagram page
+ */
+function InstagramResolver() {
+}
+InstagramResolver.prototype.resolve = function(url, clbk) {
+    var id = url.match(/http:\/\/instagram.com\/p\/([^\/]+)/);
+    if (id.length > 1) {
+        url = 'http://instagram.com/p/' + id[1] + '/media/?size=l';
+        clbk(url);
+        return;
+    }
+    clbk(null);
+};
+
+/**
  * Flickr photo page
  */
 function FlickrResolver(apikey) {
