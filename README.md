@@ -11,6 +11,7 @@ Works without any extra request with:
 * image URLs
 * imgur.com photo pages
 * 9gag
+* Instagram
 
 Works with an additional request:
 
@@ -30,6 +31,7 @@ The API might break in the future.
     ImageResolver.register(new FileExtensionResolver());
     ImageResolver.register(new ImgurPageResolver());
     ImageResolver.register(new NineGagResolver());
+    ImageResolver.register(new InstagramResolver());
     ImageResolver.resolve(url, callback);
     </script>
 
