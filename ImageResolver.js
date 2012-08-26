@@ -64,9 +64,9 @@ FileExtensionResolver.prototype.resolve = function(url, clbk) {
 function ImgurPageResolver() {
 }
 ImgurPageResolver.prototype.resolve = function(url, clbk) {
-    var matches = url.match(/http:\/\/imgur.com\/(.*)/) || [];
-    if (matches.length && (-1 === matches[1].indexOf('/'))) {
-        clbk('http://i.imgur.com/' + matches[1] + '.jpg');
+    var matches = url.match(/http:\/\/(i\.)*imgur.com\/(.*)/) || [];
+    if (matches.length && (-1 === matches[2].indexOf('/'))) {
+        clbk('http://i.imgur.com/' + matches[2] + '.jpg');
         return;
     }
     clbk(null);
