@@ -196,9 +196,13 @@ WebpageResolver.prototype._parseTag = function(tag) {
     var attr = tag.match(/(\S+)=["']?([^"']*)["']?/g);
     var attributes = {};
     var parts;
-    for (var i=0,l=attr.length; i<l; i++) {
-        parts = attr[i].split('=');
-        attributes[parts[0].toLowerCase()] = parts[1].replace(/^["']/,'').replace(/["']$/, '');
+    if (attr) {
+        for (var i=0,l=attr.length; i<l; i++) {
+            parts = attr[i].split('=');
+            if (parts.length > 1) {
+                attributes[parts[0].toLowerCase()] = parts[1].replace(/^["']/,'').replace(/["']$/, '');
+            }
+        }
     }
     return {
         tag: tagname,
