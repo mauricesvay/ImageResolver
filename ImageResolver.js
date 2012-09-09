@@ -2,7 +2,26 @@ window.ImageResolver = (function(){
 
     function ImageResolver() {
         this.filters = [];
+        this.cache = {};
     }
+
+    ImageResolver.prototype.fetch = function(url, success, error) {
+        var cache = this.cache;
+        if (url in cache) {
+            success(cache[url]);
+        } else {
+            $.ajax({
+                url : url,
+                method: 'GET',
+                dataType: 'text',
+                success: function(html) {
+                    cache[url] = html;
+                    success(html);
+                },
+                error: error
+            });
+        }
+    };
 
     ImageResolver.prototype.register = function(fn) {
         this.filters.push(fn);
@@ -211,11 +230,9 @@ WebpageResolver.prototype._parseTag = function(tag) {
 };
 WebpageResolver.prototype.resolve = function(url, clbk) {
     var self = this;
-    $.ajax({
-        url : url,
-        method: 'GET',
-        dataType: 'text',
-        success: function(html) {
+    ImageResolver.fetch(
+        url,
+        function(html) {
             var images = html.match(/<img([^>]*)>/g) || [];
             var image;
             var candidates = [];
@@ -251,11 +268,11 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
             clbk(null);
             return;
         },
-        error: function() {
+        function() {
             clbk(null);
             return;
         }
-    });
+    );
 };
 
 /**
@@ -265,12 +282,9 @@ function OpengraphResolver() {
 }
 OpengraphResolver.prototype.resolve = function(url, clbk) {
     var self = this;
-    //@FIXME: prevent multiple request. Should reuse previous one.
-    $.ajax({
-        url : url,
-        method: 'GET',
-        dataType: 'text',
-        success: function(html) {
+    ImageResolver.fetch(
+        url,
+        function(html) {
             var meta = html.match(/<meta([^>]*)>/g) || [];
             var tag;
             var image = null;
@@ -285,9 +299,9 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
             clbk(image);
             return;
         },
-        error: function() {
+        function() {
             clbk(null);
             return;
         }
-    });
+    );
 };
