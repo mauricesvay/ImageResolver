@@ -242,7 +242,7 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
                 if (tag.attributes.src && tag.attributes.width && tag.attributes.height) {
                     candidates.push({
                         url: tag.attributes.src,
-                        surface: tag.attributes.width * tag.attributes.height
+                        surface: parseInt(tag.attributes.width, 10) * parseInt(tag.attributes.height,10)
                     });
                 }
             }
