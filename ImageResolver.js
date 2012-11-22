@@ -204,29 +204,20 @@ FlickrResolver.prototype.resolve = function(url, clbk) {
  */
 function WebpageResolver() {
 }
-//Good-enough tag parser
-//Doesn't support attr with no value
-//Doesn't support values with = (equal character)
 WebpageResolver.prototype._parseTag = function(tag) {
-    tag = tag.replace('/>', '>');
-    tag = tag.replace('>','');
-    tag = tag.replace('<','');
-    var tagname = tag.substr(0, tag.indexOf(' '));
-    var attr = tag.match(/(\S+)=["']?([^"']*)["']?/g);
+    var fragment = document.createElement('div');
+    fragment.innerHTML = tag;
+
+    var elem = fragment.firstChild;
     var attributes = {};
-    var parts;
-    if (attr) {
-        for (var i=0,l=attr.length; i<l; i++) {
-            parts = attr[i].split('=');
-            if (parts.length > 1) {
-                attributes[parts[0].toLowerCase()] = parts[1].replace(/^["']/,'').replace(/["']$/, '');
-            }
-        }
+    for (var i=0, l=elem.attributes.length; i<l; i++) {
+        attributes[elem.attributes[i].name.toLowerCase()] = elem.attributes[i].value;
     }
-    return {
-        tag: tagname,
-        attributes: attributes
+    var ret = {
+        tag : elem.tagName,
+        attributes : attributes
     };
+    return ret;
 };
 WebpageResolver.prototype.resolve = function(url, clbk) {
     var self = this;
