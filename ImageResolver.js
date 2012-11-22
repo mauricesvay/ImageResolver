@@ -183,7 +183,7 @@ FlickrResolver.prototype.resolve = function(url, clbk) {
                 if (data && data.sizes && data.sizes.size) {
                     var sizes = data.sizes.size;
                     for (var i=0, l=sizes.length; i<l; i++) {
-                        if (sizes[i].label === 'Large') {
+                        if (sizes[i].label === 'Large' || sizes[i].label === 'Original') {
                             clbk(sizes[i].source);
                             return;
                         }
