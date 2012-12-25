@@ -149,9 +149,9 @@ NineGagResolver.prototype.resolve = function(url, clbk) {
 function InstagramResolver() {
 }
 InstagramResolver.prototype.resolve = function(url, clbk) {
-    var id = url.match(/http:\/\/instagram.com\/p\/([^\/]+)/);
+    var id = url.match(/http:\/\/instagr(\.am|am\.com)\/p\/([^\/]+)/);
     if (id && id.length > 1) {
-        url = 'http://instagram.com/p/' + id[1] + '/media/?size=l';
+        url = 'http://instagram.com/p/' + id[2] + '/media/?size=l';
         clbk(url);
         return;
     }
