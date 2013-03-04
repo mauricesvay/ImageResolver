@@ -283,15 +283,16 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
                 //@FIXME: remove dependency on WebpageResolver
                 tag = WebpageResolver.prototype._parseTag(meta[i]);
 
-                if (tag.attributes.property && tag.attributes.property === 'og:image' && tag.attributes.content) {
-                    image = tag.attributes.content;
-                    break;
-                }
-
                 if (tag.attributes.name && tag.attributes.name === 'twitter:image' && tag.attributes.value) {
                     image = tag.attributes.value;
                     break;
                 }
+                
+                if (tag.attributes.property && tag.attributes.property === 'og:image' && tag.attributes.content) {
+                    image = tag.attributes.content;
+                    break;
+                }
+                
             }
             clbk(image);
             return;
