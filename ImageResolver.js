@@ -222,6 +222,49 @@ WebpageResolver.prototype._parseTag = function(tag) {
     }
     return ret;
 };
+WebpageResolver.prototype._score = function(image) {
+    var score = 0;
+    var src;
+    if (image.attributes.src) {
+        src = image.attributes.src;
+    }
+    if (image.attributes['data-src']) {
+        src = image.attributes['data-src'];
+    }
+    if (image.attributes['data-lazy-src']) {
+        src = image.attributes['data-lazy-src'];
+    }
+
+    if (src.match(/(large|big)/)) {
+        score++;
+    }
+    if (src.match('wp-content/uploads')) {
+        score++;
+    }
+    if (src.match('media')) {
+        score++;
+    }
+    if (src.match('gravatar.com')) {
+        score--;
+    }
+    if (src.match('feeds.feedburner.com')) {
+        score--;
+    }
+    if (src.match('touch-icon')) {
+        score--;
+    }
+    if (src.match('1x1')) {
+        score--;
+    }
+    if (src.match('spacer.gif')) {
+        score--;
+    }
+    if (src.match(/ads/i)) {
+        score--;
+    }
+
+    return score;
+};
 WebpageResolver.prototype.resolve = function(url, clbk) {
     var self = this;
     ImageResolver.fetch(
@@ -230,11 +273,15 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
             var images = html.match(/<img([^>]*)>/g) || [];
             var image;
             var candidates = [];
+            var significant_surface = 16*16;
+            var significant_surface_count = 0;
             var tag;
             var src;
+            var surface;
             for (var i=0,l=images.length; i<l; i++) {
+                surface = 0;
                 tag = self._parseTag(images[i]);
-                if (tag && tag.attributes && tag.attributes.src && tag.attributes.width && tag.attributes.height) {
+                if (tag && tag.attributes && tag.attributes.src){
 
                     //Check for lazy loaded images
                     src = tag.attributes.src;
@@ -245,17 +292,42 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
                         src = tag.attributes['data-lazy-src'];
                     }
 
+                    // Compute surface area, even when only 1 dimension is specified
+                    if (tag.attributes.width) {
+                        if (tag.attributes.height) {
+                            surface = parseInt(tag.attributes.width, 10) * parseInt(tag.attributes.height,10);
+                        } else {
+                            surface = parseInt(tag.attributes.width, 10);
+                        }
+                    } else {
+                        if (tag.attributes.height) {
+                            surface = parseInt(tag.attributes.height,10);
+                        } else {
+                            surface = 0;
+                        }
+                    }
+                    if (surface > significant_surface) {
+                        significant_surface_count++;
+                    }
+
                     candidates.push({
                         url: src,
-                        surface: parseInt(tag.attributes.width, 10) * parseInt(tag.attributes.height,10)
+                        surface: surface,
+                        score: self._score(tag)
                     });
                 }
             }
 
             if (candidates.length) {
-                candidates = candidates.sort(function(a,b){
-                    return b.surface - a.surface;
-                });
+                if (significant_surface_count > 0) {
+                    candidates = candidates.sort(function(a,b){
+                        return b.surface - a.surface;
+                    });
+                } else {
+                    candidates = candidates.sort(function(a,b){
+                        return b.score - a.score;
+                    });
+                }
                 image = candidates[0].url;
 
                 //Resolve relative url
