@@ -327,8 +327,8 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
                     if (images[i].url.match(/(large|big)/i)) {
                         images[i].score++;
                     }
-                    // Increase score for twitter on twitpic.com
-                    if (images[i].url.indexOf('twitpic') && images[i].type === 'twitter') {
+                    // Increase score for twitter
+                    if (images[i].type === 'twitter') {
                         images[i].score++;
                     }
                 }
