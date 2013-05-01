@@ -278,21 +278,64 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
         function(html) {
             var meta = html.match(/<meta([^>]*)>/g) || [];
             var tag;
+            var images = [];
             var image = null;
+            var tags = [
+                {
+                    type: "facebook",
+                    attribute : "property",
+                    name : "og:image",
+                    value : "content"
+                },
+                {
+                    type: "twitter",
+                    attribute : "name",
+                    name : "twitter:image",
+                    value : "value"
+                },
+                {
+                    type: "twitter",
+                    attribute : "name",
+                    name : "twitter:image",
+                    value : "content"
+                }
+            ];
+
             for (var i=0,l=meta.length; i<l; i++) {
                 //@FIXME: remove dependency on WebpageResolver
                 tag = WebpageResolver.prototype._parseTag(meta[i]);
 
-                if (tag.attributes.name && tag.attributes.name === 'twitter:image' && tag.attributes.value) {
-                    image = tag.attributes.value;
-                    break;
+                for (var j=0, m=tags.length; j<m; j++) {
+                    if (
+                        tag.attributes[tags[j].attribute] &&
+                        tag.attributes[tags[j].attribute] === tags[j].name &&
+                        tag.attributes[tags[j].value]
+                    ) {
+                        images.push({
+                            url: tag.attributes[tags[j].value],
+                            type: tags[j].type,
+                            score: 0
+                        });
+                    }
                 }
-                
-                if (tag.attributes.property && tag.attributes.property === 'og:image' && tag.attributes.content) {
-                    image = tag.attributes.content;
-                    break;
+            }
+            if (images.length === 1) {
+                image = images[0].url;
+            } else if (images.length > 1) {
+                for (i=0, l=images.length; i<l; i++) {
+                    //Increase score for image containing "large" or "big" in url
+                    if (images[i].url.match(/(large|big)/i)) {
+                        images[i].score++;
+                    }
+                    // Increase score for twitter on twitpic.com
+                    if (images[i].url.indexOf('twitpic') && images[i].type === 'twitter') {
+                        images[i].score++;
+                    }
                 }
-                
+                images.sort(function(a,b){
+                    return b.score - a.score;
+                });
+                image = images[0].url;
             }
             clbk(image);
             return;
