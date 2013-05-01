@@ -295,18 +295,21 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
             var images = [];
             var image = null;
             var tags = [
+                // Facebook, Google+
                 {
                     type: "facebook",
                     attribute : "property",
                     name : "og:image",
                     value : "content"
                 },
+                // Old Twitter card
                 {
                     type: "twitter",
                     attribute : "name",
                     name : "twitter:image",
                     value : "value"
                 },
+                // New Twitter card
                 {
                     type: "twitter",
                     attribute : "name",
