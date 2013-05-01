@@ -57,6 +57,7 @@ Why it's hard
 * Servers prevent leeching by returning 403 or altered images
 * HTTP redirections, HTML redirections
 * Authentication
+* Image URLs can be relative to host or protocol
 
 License
 -------

@@ -97,10 +97,10 @@ ImgurPageResolver.prototype.resolve = function(url, clbk) {
 function ImgurAlbumResolver() {
 }
 ImgurAlbumResolver.prototype.resolve = function(url, clbk) {
-    var matches = url.match(/http:\/\/imgur.com\/a\/(.*)/) || [];
+    var matches = url.match(/http:\/\/imgur.com\/(a|gallery)\/(.*)/) || [];
     var api;
     if (matches.length) {
-        api = 'http://api.imgur.com/2/album/' + matches[1] + '.json';
+        api = 'http://api.imgur.com/2/album/' + matches[2] + '.json';
         $.ajax({
             url : api,
             method: 'GET',
