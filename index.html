@@ -100,7 +100,7 @@ ImageResolver.register(new WebpageResolver());
 //Some jQuery code to make the demo work
 //Use a crossdomain proxy (required by some plugins)
 $.ajaxPrefilter('text', function(options) {
-    options.url = "http://furious-stream-4406.herokuapp.com?src=" + encodeURIComponent(options.url);
+    options.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(options.url);
 });
 $(function(){
     $('form').on('submit', function(e){
