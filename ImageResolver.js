@@ -310,6 +310,7 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
                 if (tag) {
                     for (var j=0, m=tags.length; j<m; j++) {
                         if (
+                            tag.attributes[tags[j].attribute] &&
                             tag.attributes[tags[j].attribute] === tags[j].name &&
                             tag.attributes[tags[j].value]
                         ) {
