@@ -260,11 +260,8 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
 
                 //Resolve relative url
                 if (!image.match(/^http/)) {
-                    if (image.match(/^\//)) {
-                        image = URI(url).pathname(image).toString();
-                    } else {
-                        image = URI(url).filename(image).toString();
-                    }
+                    var uri = new URI(image);
+                    image = uri.absoluteTo(url);
                 }
 
                 clbk(image);
