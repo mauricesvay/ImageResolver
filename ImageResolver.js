@@ -355,6 +355,7 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
                 });
                 image = images[0].url;
             }
+            // @TODO : resolve relative URLs
             clbk(image);
             return;
         },
