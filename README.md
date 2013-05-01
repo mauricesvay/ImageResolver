@@ -26,6 +26,7 @@ Usage
 -----
 The API might break in the future.
 
+    <script src="URI.min.js" type="text/javascript"></script>
     <script src="ImageResolver.js" type="text/javascript"></script>
     <script>
     ImageResolver.register(new FileExtensionResolver());
