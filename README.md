@@ -44,6 +44,20 @@ I'm working to reduce dependencies, but for now you need:
 * jQuery
 * URI.js
 
+Why it's hard
+-------------
+* Website do not set width or height for images
+* Images can be lazy loaded
+* Pages can be without any image
+* Pages are full of ads, transparent gif, tracking pixels, banners
+* Images are displayed as CSS backgrounds instead of <img>
+* Websites provide a logo as opengraph/twitter cards images instead of actual images
+* Flash, iframes and other embedded content
+* Javascript generated DOM
+* Servers prevent leeching by returning 403 or altered images
+* HTTP redirections, HTML redirections
+* Authentication
+
 License
 -------
 
