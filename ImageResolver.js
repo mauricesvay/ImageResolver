@@ -231,11 +231,22 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
             var image;
             var candidates = [];
             var tag;
+            var src;
             for (var i=0,l=images.length; i<l; i++) {
                 tag = self._parseTag(images[i]);
                 if (tag && tag.attributes && tag.attributes.src && tag.attributes.width && tag.attributes.height) {
+
+                    //Check for lazy loaded images
+                    src = tag.attributes.src;
+                    if (tag.attributes['data-src']) {
+                        src = tag.attributes['data-src'];
+                    }
+                    if (tag.attributes['data-lazy-src']) {
+                        src = tag.attributes['data-lazy-src'];
+                    }
+
                     candidates.push({
-                        url: tag.attributes.src,
+                        url: src,
                         surface: parseInt(tag.attributes.width, 10) * parseInt(tag.attributes.height,10)
                     });
                 }
