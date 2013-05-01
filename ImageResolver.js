@@ -210,13 +210,16 @@ WebpageResolver.prototype._parseTag = function(tag) {
 
     var elem = fragment.firstChild;
     var attributes = {};
-    for (var i=0, l=elem.attributes.length; i<l; i++) {
-        attributes[elem.attributes[i].name.toLowerCase()] = elem.attributes[i].value;
+    var ret = null;
+    if (elem && elem.attributes) {
+        for (var i=0, l=elem.attributes.length; i<l; i++) {
+            attributes[elem.attributes[i].name.toLowerCase()] = elem.attributes[i].value;
+        }
+        ret = {
+            tag : elem.tagName,
+            attributes : attributes
+        };
     }
-    var ret = {
-        tag : elem.tagName,
-        attributes : attributes
-    };
     return ret;
 };
 WebpageResolver.prototype.resolve = function(url, clbk) {
@@ -230,7 +233,7 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
             var tag;
             for (var i=0,l=images.length; i<l; i++) {
                 tag = self._parseTag(images[i]);
-                if (tag.attributes.src && tag.attributes.width && tag.attributes.height) {
+                if (tag && tag.attributes && tag.attributes.src && tag.attributes.width && tag.attributes.height) {
                     candidates.push({
                         url: tag.attributes.src,
                         surface: parseInt(tag.attributes.width, 10) * parseInt(tag.attributes.height,10)
@@ -304,18 +307,18 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
             for (var i=0,l=meta.length; i<l; i++) {
                 //@FIXME: remove dependency on WebpageResolver
                 tag = WebpageResolver.prototype._parseTag(meta[i]);
-
-                for (var j=0, m=tags.length; j<m; j++) {
-                    if (
-                        tag.attributes[tags[j].attribute] &&
-                        tag.attributes[tags[j].attribute] === tags[j].name &&
-                        tag.attributes[tags[j].value]
-                    ) {
-                        images.push({
-                            url: tag.attributes[tags[j].value],
-                            type: tags[j].type,
-                            score: 0
-                        });
+                if (tag) {
+                    for (var j=0, m=tags.length; j<m; j++) {
+                        if (
+                            tag.attributes[tags[j].attribute] === tags[j].name &&
+                            tag.attributes[tags[j].value]
+                        ) {
+                            images.push({
+                                url: tag.attributes[tags[j].value],
+                                type: tags[j].type,
+                                score: 0
+                            });
+                        }
                     }
                 }
             }
