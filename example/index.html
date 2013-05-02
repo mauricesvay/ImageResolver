@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ImageResolver demo : HackerNews feed</title>
+    <link href='screen.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="../URI.min.js"></script>
+    <script type="text/javascript" src="../ImageResolver.js"></script>
+    <script type="text/javascript" src="FeedParser.js"></script>
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="packery.pkgd.min.js"></script>
+</head>
+<body>
+<p class="intro">
+    <a href="https://github.com/mauricesvay/ImageResolver">ImageResolver</a> demo : HackerNews feed
+</p>
+<div id="container">
+    <div class="loading">Loading...</div>
+</div>
+<script>
+var url = 'http://static.scripting.com/hackernews/rss.xml';
+
+window.addEventListener('load', function(){
+    loadFeed();
+});
+
+// Let's setup things
+$.ajaxPrefilter('text', function(options) {
+    options.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(options.url);
+});
+ImageResolver.register(new FileExtensionResolver());
+ImageResolver.register(new ImgurPageResolver());
+ImageResolver.register(new NineGagResolver());
+ImageResolver.register(new InstagramResolver());
+ImageResolver.register(new ImgurAlbumResolver());
+ImageResolver.register(new FlickrResolver('6a4f9b6d16c0eaced089c91a2e7e87ad')); //Please don't use my api key!
+ImageResolver.register(new OpengraphResolver());
+ImageResolver.register(new WebpageResolver());
+var feed = new FeedParser();
+var container = document.querySelector('#container');
+var pckry = new Packery( container, {
+    itemSelector: '.item',
+    gutter: 0,
+    transitionDuration: "0.6s"
+});
+var flatUIColors = [
+    '#1ABC9C','#16A085','#2ECC71','#27AE60',
+    '#3498DB','#2980B9','#9B59B6','#8E44AD',
+    '#34495E','#2C3E50','#F1C40F','#F39C12',
+    '#E67E22','#D35400','#E74C3C','#C0392B',
+    /*'#ECF0F1',*/'#BDC3C7','#95A5A6','#7F8C8D'
+];
+
+// Load feed
+function loadFeed() {
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'text',
+        success: parseFeed
+    });
+}
+
+// Parse feed, resolve images
+function parseFeed(data) {
+    container.innerHTML = '';
+    var item;
+    var links;
+    var link;
+    var title;
+    var img;
+    feed.parse($.parseXML(data));
+    for (var i=0,l=feed.items.length; i<l; i++) {
+        item = feed.items[i];
+        if (-1 !== url.indexOf('api.twitter.com')) {
+            links = extractUrl(item.description);
+        } else {
+            links = extractUrl(item.link);
+        }
+
+        if (links && links.length) {
+            link = links[0];
+            (function(link, title) {
+                ImageResolver.resolve(link, function(image){
+                    displayItem(link, title, image);
+                });
+            })(link, item.title);
+        }
+    }
+}
+
+// Display item
+function displayItem(link, title, image) {
+    var sizeClass = 'w2';
+    var elem = document.createElement('div');
+    elem.className = "item ";
+
+    var hash = 0;
+    for (var i=0,l=link.length; i<l; i++) {
+        hash += parseInt(link.charCodeAt(i),10);
+    }
+    elem.style.backgroundColor = flatUIColors[Math.floor(hash % flatUIColors.length)];
+
+    if (image) {
+
+        img = new Image();
+        img.src = image;
+        img.onload = function() {
+            var size = this.width * this.height;
+
+            if (size < 100*100) {
+                image = '';
+            }
+
+            if (size > 300*300 && (Math.random() > 0.5)) {
+                sizeClass = 'w4';
+            }
+
+            elem.innerHTML = [
+                '<a href="' + link + '">',
+                '<div class="img" style="background-image:url(\'' + this.src + '\')"></div>',
+                '<h1>' + title + '</h1>',
+                '</a>'
+            ].join('');
+
+            elem.className += sizeClass;
+            container.appendChild(elem);
+            pckry.appended(elem);
+        }
+    } else {
+        elem.innerHTML = [
+            '<a href="' + link + '">',
+            '<div class="img"></div>',
+            '<h1>' + title + '</h1>',
+            '</a>'
+        ].join('');
+        elem.className += sizeClass;
+        container.appendChild(elem);
+        pckry.appended(elem);
+    }
+}
+</script>
+</body>
+</html>
