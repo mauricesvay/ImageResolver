@@ -205,12 +205,14 @@ FlickrResolver.prototype.resolve = function(url, clbk) {
 function WebpageResolver() {
 }
 WebpageResolver.prototype._parseTag = function(tag) {
-    var fragment = document.createElement('div');
-    fragment.innerHTML = tag;
-
-    var elem = fragment.firstChild;
-    var attributes = {};
     var ret = null;
+    var doc;
+    var elem;
+    var attributes = {};
+
+    doc = document.implementation.createHTMLDocument("");
+    doc.documentElement.innerHTML = tag;
+    elem = doc.documentElement.querySelector('img');
     if (elem && elem.attributes) {
         for (var i=0, l=elem.attributes.length; i<l; i++) {
             attributes[elem.attributes[i].name.toLowerCase()] = elem.attributes[i].value;
