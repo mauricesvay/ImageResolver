@@ -283,15 +283,20 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
             for (var i=0,l=images.length; i<l; i++) {
                 surface = 0;
                 tag = self._parseTag(images[i]);
-                if (tag && tag.attributes && tag.attributes.src){
+                if (tag && tag.attributes){
 
                     //Check for lazy loaded images
-                    src = tag.attributes.src;
+                    if (tag.attributes.src) {
+                        src = tag.attributes.src;
+                    }
                     if (tag.attributes['data-src']) {
                         src = tag.attributes['data-src'];
                     }
                     if (tag.attributes['data-lazy-src']) {
                         src = tag.attributes['data-lazy-src'];
+                    }
+                    if (!src){
+                        continue;
                     }
 
                     // Compute surface area, even when only 1 dimension is specified
