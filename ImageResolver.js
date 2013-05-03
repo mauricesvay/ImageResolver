@@ -240,7 +240,7 @@ WebpageResolver.prototype._score = function(image) {
     if (src.match(/(large|big)/)) {
         score++;
     }
-    if (src.match('wp-content/uploads')) {
+    if (src.match('upload')) {
         score++;
     }
     if (src.match('media')) {
@@ -252,7 +252,7 @@ WebpageResolver.prototype._score = function(image) {
     if (src.match('feeds.feedburner.com')) {
         score--;
     }
-    if (src.match('touch-icon')) {
+    if (src.match('icon')) {
         score--;
     }
     if (src.match('1x1')) {
