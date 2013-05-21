@@ -21,7 +21,8 @@
 
         <div class="samples">
             <a href="https://news.ycombinator.com/rss">Hacker News</a> |
-            <a href="http://digg.com/rss/top.rss">Digg Top Stories</a>
+            <a href="http://digg.com/rss/top.rss">Digg Top Stories</a> |
+            <a href="http://gdata.youtube.com/feeds/base/standardfeeds/most_popular?client=ytapi-youtube-browse&amp;alt=rss&amp;time=today">Youtube Most Popular</a>
         </div>
     </form>
 </p>
@@ -122,7 +123,7 @@ function displayItem(link, title, image) {
         img.src = image;
         img.onload = function() {
             var size = this.width * this.height;
-console.log(link, size);
+
             if (size < 100*100) {
                 image = '';
             } else {
