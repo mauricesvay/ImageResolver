@@ -449,7 +449,7 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
             }
 
             //Resolve relative url
-            if (!image.match(/^http/)) {
+            if (image && !image.match(/^http/)) {
                 var uri = new URI(image);
                 image = uri.absoluteTo(url);
             }
