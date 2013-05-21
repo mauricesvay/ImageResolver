@@ -387,6 +387,13 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
                     name : "og:image",
                     value : "content"
                 },
+                // Old Facebook
+                {
+                    type: "facebook",
+                    attribute : "rel",
+                    name : "image_src",
+                    value : "href"
+                },
                 // Old Twitter card
                 {
                     type: "twitter",
@@ -440,7 +447,13 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
                 });
                 image = images[0].url;
             }
-            // @TODO : resolve relative URLs
+
+            //Resolve relative url
+            if (!image.match(/^http/)) {
+                var uri = new URI(image);
+                image = uri.absoluteTo(url);
+            }
+
             clbk(image);
             return;
         },
