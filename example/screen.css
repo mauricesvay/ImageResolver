@@ -1,38 +1,44 @@
 body {
     margin: 0;
     padding: 0;
-    background: #112;
-    color: #FFF;
+    background: #EEE;
+    color: #444;
     font-family: 'Avenir', sans-serif;
+    line-height: 2;
+}
+input {
+    font-family: 'Avenir', sans-serif;
+    font-size: 1em;
 }
 a {
-    color: #FFF;
+    color: #444;
 }
-.intro {
-    width: 1200px;
-    margin: 1em auto;
+label {
+    display: block;
 }
+.intro,
+#feedreader,
 #container {
-    width: 1200px;
-    margin: 0 auto;
+    margin: 1em 2em;
 }
 .item {
     display: block;
     float: left;
+    position: relative;
     background: #000;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     overflow: hidden;
     padding: 0;
-}
-.w2 {
+    margin: 10px;
     width: 200px;
-    height: 200px;
+    height: 260px;
+    border-radius: 8px;
+    border: 1px solid #DDD;
 }
-.w4 {
-    width: 400px;
-    height: 400px;
+.item:hover {
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
 }
     .img {
         background-repeat: no-repeat;
@@ -48,27 +54,17 @@ a {
         text-decoration: none;
     }
     .item h1 {
+        padding: 10px;
         margin: 0;
         font-weight: 700;
-        color: #FFF;
+        line-height: 1.2;
+        color: #444;
         text-decoration: none;
-        background: rgba(0,0,0,.6);
+        background: #FFF;
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 5px;
-    }
-    .item a:hover h1 {
-        background: rgba(0,0,0,.9);
-    }
-    .w2 h1 {
         font-size: 0.8em;
+        height: 40px;
     }
-    .w4 h1 {
-        font-size: 1.2em;
-    }
-
-.loading {
-    padding: 1em;
-}

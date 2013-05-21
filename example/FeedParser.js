@@ -2,19 +2,18 @@
  * Item
  */
 function FeedItem() {
+    this.title = '';
+    this.link = '';
+    this.description = '';
+    this.date = '';
+    this.id = '';
 }
 FeedItem.prototype = {
-    title: '',
-    link: '',
-    description: '',
-    date: '',
-    id: '',
-
     toString: function() {
         return [
             this.title,
             this.link,
-            //this.description,
+            this.description,
             this.date,
             this.id
         ].join("\n");
@@ -25,16 +24,10 @@ FeedItem.prototype = {
  * Parser
  */
 function FeedParser() {
+    this.items = [];
 }
 
 FeedParser.prototype = {
-    feedType : '',
-    version: '',
-    title: '',
-    link: '',
-    description: '',
-    items: [],
-
     parse: function(xml) {
         this.feedType = this.detectFormat(xml);
         switch (this.feedType) {
