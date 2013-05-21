@@ -236,33 +236,30 @@ WebpageResolver.prototype._score = function(image) {
     if (image.attributes['data-lazy-src']) {
         src = image.attributes['data-lazy-src'];
     }
+    if (!src) {
+        return;
+    }
 
-    if (src.match(/(large|big)/)) {
-        score++;
-    }
-    if (src.match('upload')) {
-        score++;
-    }
-    if (src.match('media')) {
-        score++;
-    }
-    if (src.match('gravatar.com')) {
-        score--;
-    }
-    if (src.match('feeds.feedburner.com')) {
-        score--;
-    }
-    if (src.match('icon')) {
-        score--;
-    }
-    if (src.match('1x1')) {
-        score--;
-    }
-    if (src.match('spacer.gif')) {
-        score--;
-    }
-    if (src.match(/ads/i)) {
-        score--;
+    var rules = [
+        {pattern:/(large|big)/, score:1},
+        {pattern:'upload', score:1},
+        {pattern:'media', score:1},
+        {pattern:'gravatar.com', score:-1},
+        {pattern:'feeds.feedburner.com', score:-1},
+        {pattern:/icon/i, score:-1},
+        {pattern:/logo/i, score:-1},
+        {pattern:/spinner/i, score:-1},
+        {pattern:/loading/i, score:-1},
+        {pattern:'badge', score:-1},
+        {pattern:'1x1', score:-1},
+        {pattern:'pixel', score:-1},
+        {pattern:/ads/i, score:-1}
+    ];
+
+    for (var i=0,l=rules.length; i<l; i++) {
+        if (src.match(rules[i].pattern)) {
+            score += rules[i].score;
+        }
     }
 
     return score;
@@ -325,28 +322,38 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
                 }
             }
 
-            if (candidates.length) {
-                if (significant_surface_count > 0) {
-                    candidates = candidates.sort(function(a,b){
-                        return b.surface - a.surface;
-                    });
-                } else {
-                    candidates = candidates.sort(function(a,b){
-                        return b.score - a.score;
-                    });
-                }
-                image = candidates[0].url;
-
-                //Resolve relative url
-                if (!image.match(/^http/)) {
-                    var uri = new URI(image);
-                    image = uri.absoluteTo(url);
-                }
-
-                clbk(image);
+            if (!candidates.length) {
+                clbk(null);
                 return;
             }
-            clbk(null);
+
+            //Remove scores below 0
+            candidates = candidates.filter(function(item){
+                return (item.score >= 0);
+            });
+            if (!candidates.length) {
+                clbk(null);
+                return;
+            }
+
+            //Sort candidates by size, or score
+            if (significant_surface_count > 0) {
+                candidates = candidates.sort(function(a,b){
+                    return b.surface - a.surface;
+                });
+            } else {
+                candidates = candidates.sort(function(a,b){
+                    return b.score - a.score;
+                });
+            }
+            image = candidates[0].url;
+            //Resolve relative url
+            if (!image.match(/^http/)) {
+                var uri = new URI(image);
+                image = uri.absoluteTo(url);
+            }
+
+            clbk(image);
             return;
         },
         function() {
@@ -366,6 +373,7 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
     ImageResolver.fetch(
         url,
         function(html) {
+            // @TODO : add <link rel="image_src" href="http://www.example.com/facebook-logo.jpg" />
             var meta = html.match(/<meta([^>]*)>/g) || [];
             var tag;
             var images = [];
