@@ -212,7 +212,8 @@ WebpageResolver.prototype._parseTag = function(tag) {
 
     doc = document.implementation.createHTMLDocument("");
     doc.documentElement.innerHTML = tag;
-    elem = doc.documentElement.querySelector('img');
+
+    elem = doc.documentElement.querySelector('head > *, body > *');
     if (elem && elem.attributes) {
         for (var i=0, l=elem.attributes.length; i<l; i++) {
             attributes[elem.attributes[i].name.toLowerCase()] = elem.attributes[i].value;
@@ -374,7 +375,7 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
         url,
         function(html) {
             // @TODO : add <link rel="image_src" href="http://www.example.com/facebook-logo.jpg" />
-            var meta = html.match(/<meta([^>]*)>/g) || [];
+            var meta = html.match(/<(meta|link)([^>]*)>/g) || [];
             var tag;
             var images = [];
             var image = null;
