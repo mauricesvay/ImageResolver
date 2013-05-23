@@ -4,6 +4,8 @@ ImageResolver.js
 ImageResolver.js is a library that extracts the main image of a URL while saving resources.
 Instead of loading all images of a URL, it will try to guess the main image from the URL or the page HTML.
 
+It's like Readability for images.
+
 **Demo** : [http://mauricesvay.github.com/ImageResolver/](http://mauricesvay.github.com/ImageResolver/)
 
 Works without any extra request with:
