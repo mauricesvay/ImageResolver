@@ -83,9 +83,9 @@ FileExtensionResolver.prototype.resolve = function(url, clbk) {
 function ImgurPageResolver() {
 }
 ImgurPageResolver.prototype.resolve = function(url, clbk) {
-    var matches = url.match(/http:\/\/(i\.)*imgur.com\/(.*)/) || [];
-    if (matches.length && (-1 === matches[2].indexOf('/'))) {
-        clbk('http://i.imgur.com/' + matches[2] + '.jpg');
+    var matches = url.match(/http:\/\/(i\.)*imgur.com\/(gallery\/){0,1}(.*)/);
+    if (matches && matches.length && (-1 === matches[matches.length-1].indexOf('/'))) {
+        clbk('http://i.imgur.com/' + matches[matches.length-1] + '.jpg'); //@FIXME : image can be gif or png
         return;
     }
     clbk(null);
@@ -97,7 +97,7 @@ ImgurPageResolver.prototype.resolve = function(url, clbk) {
 function ImgurAlbumResolver() {
 }
 ImgurAlbumResolver.prototype.resolve = function(url, clbk) {
-    var matches = url.match(/http:\/\/imgur.com\/(a|gallery)\/(.*)/) || [];
+    var matches = url.match(/http:\/\/imgur.com\/(a)\/(.*)/) || [];
     var api;
     if (matches.length) {
         api = 'http://api.imgur.com/2/album/' + matches[2] + '.json';
