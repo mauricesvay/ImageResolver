@@ -8,15 +8,19 @@ window.ImageResolver = (function(){
     ImageResolver.prototype.fetch = function(url, success, error) {
         var cache = this.cache;
         if (url in cache) {
-            success(cache[url]);
+            success(cache[url].html, cache[url].status, cache[url].xhr);
         } else {
             $.ajax({
                 url : url,
                 method: 'GET',
                 dataType: 'text',
-                success: function(html) {
-                    cache[url] = html;
-                    success(html);
+                success: function(html, status, xhr) {
+                    cache[url] = {
+                        html:html,
+                        status:status,
+                        xhr:xhr
+                    };
+                    success(html, status, xhr);
                 },
                 error: error
             });
@@ -38,6 +42,7 @@ window.ImageResolver = (function(){
                     self.next(filters.slice(1), url, clbk);
                     return;
                 } else {
+                    //console.log('Resolved with ' + filter.constructor.name);
                     clbk(data);
                     return;
                 }
@@ -198,6 +203,28 @@ FlickrResolver.prototype.resolve = function(url, clbk) {
     clbk(null);
     return;
 };
+
+function MimeTypeResolver() {
+}
+MimeTypeResolver.prototype.resolve = function(url,clbk) {
+    ImageResolver.fetch(
+        url,
+        function(html, status, xhr) {
+            var contentType = xhr.getResponseHeader("Content-Type");
+
+            switch (contentType) {
+                case "image/jpeg":
+                case "image/png":
+                case "image/gif":
+                    clbk(url);
+                    break;
+                default:
+                    clbk(null);
+            }
+
+        }
+    );
+}
 
 /**
  * Any web page

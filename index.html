@@ -92,6 +92,7 @@ ImageResolver.register(new NineGagResolver());
 ImageResolver.register(new InstagramResolver());
 
 //Resolvers that need extra ajax requests
+ImageResolver.register(new MimeTypeResolver());
 ImageResolver.register(new ImgurAlbumResolver());
 ImageResolver.register(new FlickrResolver('6a4f9b6d16c0eaced089c91a2e7e87ad')); //Please don't use my api key!
 ImageResolver.register(new OpengraphResolver());
