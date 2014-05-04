@@ -1,0 +1,29 @@
+{
+    "name": "ImageResolver",
+    "version": "0.0.1",
+    "description": "Extract main image for a given URL",
+    "main": "src/ImageResolver.js",
+    "directories": {
+        "example": "example",
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mauricesvay/ImageResolver.git"
+    },
+    "author": "Maurice Svay <maurice@svay.com>",
+    "license": "BSD",
+    "bugs": {
+        "url": "https://github.com/mauricesvay/ImageResolver/issues"
+    },
+    "homepage": "https://github.com/mauricesvay/ImageResolver",
+    "devDependencies": {
+        "browserify": "^3.46.0",
+        "htmlparser2": "^3.7.1",
+        "gulp": "^3.6.2",
+        "vinyl-source-stream": "^0.1.1"
+    }
+}

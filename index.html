@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <title>ImageResolver</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-    <script src="URI.min.js" type="text/javascript"></script>
-    <script src="ImageResolver.js" type="text/javascript"></script>
+    <script src="dist/ImageResolver.min.js" type="text/javascript"></script>
     <style>
     body {
         font-family: Helvetica, Arial, sans-serif;
@@ -82,35 +81,36 @@
 <div id="result"></div>
 
 <script>
-//The ImageResolver will try all the resolvers one after the other
-//in the order of their registration
-
-//Resolvers that guess the image URL
-ImageResolver.register(new FileExtensionResolver());
-ImageResolver.register(new ImgurPageResolver());
-ImageResolver.register(new NineGagResolver());
-ImageResolver.register(new InstagramResolver());
-
-//Resolvers that need extra ajax requests
-ImageResolver.register(new MimeTypeResolver());
-ImageResolver.register(new ImgurAlbumResolver());
-ImageResolver.register(new FlickrResolver('6a4f9b6d16c0eaced089c91a2e7e87ad')); //Please don't use my api key!
-ImageResolver.register(new OpengraphResolver());
-ImageResolver.register(new WebpageResolver());
 
 //Some jQuery code to make the demo work
 //Use a crossdomain proxy (required by some plugins)
 $.ajaxPrefilter('text', function(options) {
     options.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(options.url);
 });
+
+var resolver = new ImageResolver( { ajax : $.ajax } );
+
+//The ImageResolver will try all the resolvers one after the other
+//in the order of their registration
+resolver.register(new ImageResolver.FileExtension());
+resolver.register(new ImageResolver.NineGag());
+resolver.register(new ImageResolver.Instagram());
+resolver.register(new ImageResolver.ImgurPage());
+
+resolver.register(new ImageResolver.MimeType());
+resolver.register(new ImageResolver.Flickr( '6a4f9b6d16c0eaced089c91a2e7e87ad' ));
+resolver.register(new ImageResolver.Opengraph());
+resolver.register(new ImageResolver.Webpage());
+
 $(function(){
     $('form').on('submit', function(e){
         e.preventDefault();
         $("#url").addClass('loading');
         var url = $('#url').val();
-        ImageResolver.resolve(url, function(image){
-            if (image) {
-                $('#result').html('<code>' + image + '</code><br><img src="' + image + '" alt="">');
+        resolver.resolve(url, function( result ){
+            console.log( result );
+            if ( result ) {
+                $('#result').html('<code>' + result.image + '</code><br><img src="' + result.image + '" alt="">');
             } else {
                 $('#result').html('<h2>No image found</h2>');
             }
