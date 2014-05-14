@@ -1,0 +1,20 @@
+{
+  "name": "ImageResolver",
+  "version": "0.1.0",
+  "author": "Maurice Svay",
+  "contributors": [
+    {
+      "name": "Alexander Pekhota",
+      "email": "pekhota.alex@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mauricesvay/ImageResolver.git"
+  },
+  "dependencies": {
+    "URIjs": "^1.13.1",
+    "cheerio": "^0.16.0",
+    "request": "^2.34.0"
+  }
+}
