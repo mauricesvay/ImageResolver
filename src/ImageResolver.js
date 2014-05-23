@@ -40,10 +40,10 @@ ImageResolver.prototype.next = function(filters, url, clbk) {
                 return;
             }
         }, this.options, this.utils );
+    } else {
+        clbk(null);
         return;
     }
-    // console.log('No image found on ' + url);
-    clbk(null);
 
 };
 
@@ -55,8 +55,10 @@ ImageResolver.prototype.resolve = function(url, clbk) {
                 'url': url,
                 'image': image
             } );
+            return;
         } else {
             clbk( null );
+            return;
         }
     }
 

@@ -1,32 +1,50 @@
+var request = require('request');
+
 var Utils = function( options ){
-	this.options = options;
+	this.options = options || {};
 	this.cache = {};
 };
 
 Utils.prototype.fetch = function( url, success, error ) {
+
+    var _this = this;
+
+    if (url in this.cache) {
+        success(this.cache[url].html, this.cache[url].status, this.cache[url].xhr);
+        return;
+    }
+
 	if ( this.options.ajax ) {
-		var cache = this.cache;
-        if (url in cache) {
-            success(cache[url].html, cache[url].status, cache[url].xhr);
-        } else {
-            this.options.ajax({
-                url : url,
-                method: 'GET',
-                dataType: 'text',
-                success: function(html, status, xhr) {
-                    cache[url] = {
-                        html: html,
-                        status: status,
-                        xhr: xhr
-                    };
-                    success(html, status, xhr);
-                },
-                error: error
-            });
-        }
+        this.options.ajax({
+            url : url,
+            method: 'GET',
+            dataType: 'text',
+            success: function(html, status, xhr) {
+                _this.cache[url] = {
+                    html: html,
+                    status: status,
+                    xhr: xhr
+                };
+                success(html, status, xhr);
+            },
+            error: error
+        });
 	} else {
 		console.error('No Ajax adapter found. Instantiate ImageResolver with an "ajax" option containing a jQuery-compatible ajax function.');
-		error();
+        request( url , function( err, res ) {
+            if( err ) {
+                error();
+                return;
+            } else {
+                _this.cache[url] = {
+                    html: res.body,
+                    status: res.statusCode,
+                    xhr: null
+                };
+                success( res.body, res.statusCode, null );
+                return;
+            }
+        });
 	}
 };
 
