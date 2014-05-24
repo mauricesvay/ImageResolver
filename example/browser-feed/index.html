@@ -5,9 +5,8 @@
     <title>ImageResolver demo : feed reader</title>
     <link href='screen.css' rel='stylesheet' type='text/css'>
 
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="../URI.min.js"></script>
-    <script type="text/javascript" src="../ImageResolver.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../../dist/ImageResolver.min.js"></script>
     <script type="text/javascript" src="FeedParser.js"></script>
     <script type="text/javascript" src="utils.js"></script>
 </head>
@@ -49,15 +48,21 @@ window.addEventListener('load', function(){
 $.ajaxPrefilter('text', function(options) {
     options.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(options.url);
 });
-ImageResolver.register(new FileExtensionResolver());
-ImageResolver.register(new ImgurPageResolver());
-ImageResolver.register(new NineGagResolver());
-ImageResolver.register(new InstagramResolver());
-ImageResolver.register(new ImgurAlbumResolver());
-ImageResolver.register(new FlickrResolver('6a4f9b6d16c0eaced089c91a2e7e87ad')); //Please don't use my api key!
-ImageResolver.register(new OpengraphResolver());
-ImageResolver.register(new WebpageResolver());
+
+// Initialize ImageResolver
+var resolver = new ImageResolver( { ajax : $.ajax } );
+resolver.register(new ImageResolver.FileExtension());
+resolver.register(new ImageResolver.NineGag());
+resolver.register(new ImageResolver.Instagram());
+resolver.register(new ImageResolver.ImgurPage());
+resolver.register(new ImageResolver.MimeType());
+resolver.register(new ImageResolver.Flickr( '6a4f9b6d16c0eaced089c91a2e7e87ad' ));
+resolver.register(new ImageResolver.Opengraph());
+resolver.register(new ImageResolver.Webpage());
+
+// Initialize FeedParser
 var feed = new FeedParser();
+
 var container = document.querySelector('#container');
 var flatUIColors = [
     '#1ABC9C','#16A085','#2ECC71','#27AE60',
@@ -102,7 +107,7 @@ function parseFeed(data, status, jqxhr) {
         if (links && links.length) {
             link = links[0];
             (function(link, title) {
-                ImageResolver.resolve(link, function(image){
+                resolver.resolve(link, function(image){
                     displayItem(link, title, image);
                 });
             })(link, item.title);
@@ -125,7 +130,6 @@ function displayItem(link, title, image) {
     if (image) {
 
         img = new Image();
-        img.src = image;
         img.onload = function() {
             var size = this.width * this.height;
 
@@ -137,7 +141,7 @@ function displayItem(link, title, image) {
 
             elem.innerHTML = [
                 '<a href="' + link + '">',
-                '<div class="img" style="background-image:url(\'' + image + '\')"></div>',
+                '<div class="img" style="background-image:url(\'' + this.src + '\')"></div>',
                 '<h1>' + title + '</h1>',
                 '</a>'
             ].join('');
@@ -145,6 +149,7 @@ function displayItem(link, title, image) {
             elem.className += sizeClass;
             container.appendChild(elem);
         }
+        img.src = image.image;
     } else {
         elem.innerHTML = [
             '<a href="' + link + '">',

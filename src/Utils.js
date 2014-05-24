@@ -1,5 +1,3 @@
-var request = require('request');
-
 var Utils = function( options ){
 	this.options = options || {};
 	this.cache = {};
@@ -30,20 +28,26 @@ Utils.prototype.fetch = function( url, success, error ) {
             error: error
         });
 	} else {
-        request( url , function( err, res ) {
-            if( err ) {
-                error();
-                return;
-            } else {
-                _this.cache[url] = {
-                    html: res.body,
-                    status: res.statusCode,
-                    xhr: null
-                };
-                success( res.body, res.statusCode, null );
-                return;
-            }
-        });
+        try {
+            var request = require('request');
+
+            request( url , function( err, res ) {
+                if( err ) {
+                    error();
+                    return;
+                } else {
+                    _this.cache[url] = {
+                        html: res.body,
+                        status: res.statusCode,
+                        xhr: null
+                    };
+                    success( res.body, res.statusCode, null );
+                    return;
+                }
+            });
+        } catch ( e ) {
+            console.log('No http request lib available');
+        }
 	}
 };
 
