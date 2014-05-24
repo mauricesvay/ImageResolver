@@ -43,8 +43,8 @@ Opengraph.prototype.resolve = function(url, clbk, options, utils) {
 
     utils.fetch(
         url,
-        function onSuccess( html, status, xhr ) {
-            self.parseHTML( html, clbk, options, utils );
+        function onSuccess( data, response ) {
+            self.parseHTML( data, clbk, options, utils );
         },
         function onError(){
             clbk(null);

@@ -1,6 +1,8 @@
+var request = require('superagent');
+
 var Utils = function( options ){
-	this.options = options || {};
-	this.cache = {};
+    this.options = options || {};
+    this.cache = {};
 };
 
 Utils.prototype.fetch = function( url, success, error ) {
@@ -8,47 +10,26 @@ Utils.prototype.fetch = function( url, success, error ) {
     var _this = this;
 
     if (url in this.cache) {
-        success(this.cache[url].html, this.cache[url].status, this.cache[url].xhr);
-        return;
-    }
+        success( this.cache[url].data, this.cache[url].response );
+    } else {
+        request.get( url , function( response ) {
 
-	if ( this.options.ajax ) {
-        this.options.ajax({
-            url : url,
-            method: 'GET',
-            dataType: 'text',
-            success: function(html, status, xhr) {
+            if ( response.ok ) {
+
                 _this.cache[url] = {
-                    html: html,
-                    status: status,
-                    xhr: xhr
-                };
-                success(html, status, xhr);
-            },
-            error: error
-        });
-	} else {
-        try {
-            var request = require('request');
-
-            request( url , function( err, res ) {
-                if( err ) {
-                    error();
-                    return;
-                } else {
-                    _this.cache[url] = {
-                        html: res.body,
-                        status: res.statusCode,
-                        xhr: null
-                    };
-                    success( res.body, res.statusCode, null );
-                    return;
+                    data: response.text,
+                    response: response
                 }
-            });
-        } catch ( e ) {
-            console.log('No http request lib available');
-        }
-	}
+                success( response.text, response );
+
+            } else {
+
+                error( response );
+
+            }
+
+        });
+    }
 };
 
 module.exports = Utils;

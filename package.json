@@ -26,7 +26,8 @@
     "vinyl-source-stream": "^0.1.1"
   },
   "dependencies": {
+    "htmlparser2": "^3.7.1",
     "request": "^2.36.0",
-    "htmlparser2": "^3.7.1"
+    "superagent": "^0.18.0"
   }
 }

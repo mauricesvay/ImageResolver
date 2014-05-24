@@ -3,8 +3,8 @@ function MimeType() {
 MimeType.prototype.resolve = function( url, clbk, options, utils ) {
     utils.fetch(
         url,
-        function onSuccess( html, status, xhr ) {
-            var contentType = xhr.getResponseHeader("Content-Type");
+        function onSuccess( data, response ) {
+            var contentType = response.type;
 
             switch (contentType) {
                 case "image/jpeg":
