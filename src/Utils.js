@@ -30,7 +30,6 @@ Utils.prototype.fetch = function( url, success, error ) {
             error: error
         });
 	} else {
-		console.error('No Ajax adapter found. Instantiate ImageResolver with an "ajax" option containing a jQuery-compatible ajax function.');
         request( url , function( err, res ) {
             if( err ) {
                 error();
