@@ -49,8 +49,12 @@ $.ajaxPrefilter('text', function(options) {
     options.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(options.url);
 });
 
+function proxify(url) {
+    return "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(url);
+}
+
 // Initialize ImageResolver
-var resolver = new ImageResolver( { ajax : $.ajax } );
+var resolver = new ImageResolver();
 resolver.register(new ImageResolver.FileExtension());
 resolver.register(new ImageResolver.NineGag());
 resolver.register(new ImageResolver.Instagram());
@@ -107,7 +111,7 @@ function parseFeed(data, status, jqxhr) {
         if (links && links.length) {
             link = links[0];
             (function(link, title) {
-                resolver.resolve(link, function(image){
+                resolver.resolve(proxify(link), function(image){
                     displayItem(link, title, image);
                 });
             })(link, item.title);

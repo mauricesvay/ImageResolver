@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>ImageResolver</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-    <script src="dist/ImageResolver.min.js" type="text/javascript"></script>
+    <script src="../../dist/ImageResolver.min.js" type="text/javascript"></script>
     <style>
     body {
         font-family: Helvetica, Arial, sans-serif;
@@ -82,13 +82,11 @@
 
 <script>
 
-//Some jQuery code to make the demo work
-//Use a crossdomain proxy (required by some plugins)
-$.ajaxPrefilter('text', function(options) {
-    options.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(options.url);
-});
+function proxify( url ) {
+    return "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent( url );
+}
 
-var resolver = new ImageResolver( { ajax : $.ajax } );
+var resolver = new ImageResolver();
 
 //The ImageResolver will try all the resolvers one after the other
 //in the order of their registration
@@ -107,7 +105,7 @@ $(function(){
         e.preventDefault();
         $("#url").addClass('loading');
         var url = $('#url').val();
-        resolver.resolve(url, function( result ){
+        resolver.resolve( proxify(url), function( result ){
             console.log( result );
             if ( result ) {
                 $('#result').html('<code>' + result.image + '</code><br><img src="' + result.image + '" alt="">');
