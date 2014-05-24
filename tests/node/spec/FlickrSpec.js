@@ -15,7 +15,7 @@ describe("Flickr : Sunflowers", function(){
             return result;
         }, 10000);
         runs(function(){
-            expect(result.image).toBe("https://farm9.staticflickr.com/8431/7543031692_494bed13d4_z.jpg");
+            expect(result.image).toBe("http://farm9.staticflickr.com/8431/7543031692_494bed13d4_b.jpg");
         });
     });
 });
@@ -33,7 +33,7 @@ describe("Flickr : Tulips in Explore", function(){
             return result;
         }, 10000);
         runs(function(){
-            expect(result.image).toBe("https://farm3.staticflickr.com/2906/14248906772_8cc69441ee_z.jpg");
+            expect(result.image).toBe("http://farm3.staticflickr.com/2906/14248906772_8cc69441ee_b.jpg");
         });
     });
 });

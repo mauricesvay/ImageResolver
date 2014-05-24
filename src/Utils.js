@@ -32,4 +32,6 @@ Utils.prototype.fetch = function( url, success, error ) {
     }
 };
 
+Utils.prototype.request = request;
+
 module.exports = Utils;
