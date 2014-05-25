@@ -114,6 +114,16 @@ and the result will be cached and shared between plugins.
 If you need more control over HTTP requests, you can use `utils.request` that
 gives you access to the raw superagent library.
 
+Running tests
+-------------
+
+ImageResolver comes with a series of tests.
+
+To run those tests:
+
+* npm install -g jasmine-node
+* npm test
+
 Compiling the browser lib
 -------------------------
 
