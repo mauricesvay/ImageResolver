@@ -8,20 +8,20 @@ var MINIMUM_SURFACE = 16 * 16;
 
 function Webpage() {
 }
-Webpage.prototype._score = function(image) {
+Webpage.prototype._score = function( image ) {
     var score = 0;
     var src;
-    if (image.attributes.src) {
-        src = image.attributes.src;
+    if (image.attribs['src']) {
+        src = image.attribs['src'];
     }
-    if (image.attributes['data-src']) {
-        src = image.attributes['data-src'];
+    if (image.attribs['data-src']) {
+        src = image.attribs['data-src'];
     }
-    if (image.attributes['data-lazy-src']) {
-        src = image.attributes['data-lazy-src'];
+    if (image.attribs['data-lazy-src']) {
+        src = image.attribs['data-lazy-src'];
     }
     if (!src) {
-        return;
+        return -10;
     }
 
     var rules = [
@@ -37,7 +37,8 @@ Webpage.prototype._score = function(image) {
         {pattern:'badge', score:-1},
         {pattern:'1x1', score:-1},
         {pattern:'pixel', score:-1},
-        {pattern:/ads/i, score:-1}
+        {pattern:/ads/i, score:-1},
+        {pattern:/doubleclick/i, score:-1}
     ];
 
     for (var i=0,l=rules.length; i<l; i++) {
@@ -45,9 +46,9 @@ Webpage.prototype._score = function(image) {
             score += rules[i].score;
         }
     }
-
     return score;
 };
+
 Webpage.prototype.resolve = function(url, clbk, options, utils) {
 
     var self = this;
@@ -55,7 +56,7 @@ Webpage.prototype.resolve = function(url, clbk, options, utils) {
     utils.fetch(
         url,
         function onSuccess( data, response ) {
-            self.parseHTML( data, clbk, options, utils );
+            self.parseHTML( data, url, clbk, options, utils );
         },
         function onError(){
             clbk(null);
@@ -64,8 +65,9 @@ Webpage.prototype.resolve = function(url, clbk, options, utils) {
 
 };
 
-Webpage.prototype.parseHTML = function( html, clbk, options, utils ) {
+Webpage.prototype.parseHTML = function( html, url, clbk, options, utils ) {
     var domutils = htmlparser.DomUtils;
+    var _this = this;
 
     var handler = new htmlparser.DomHandler( function( error, dom ) {
 
@@ -75,6 +77,8 @@ Webpage.prototype.parseHTML = function( html, clbk, options, utils ) {
         }
 
         var img = domutils.getElementsByTagName('img', dom, true);
+        var images = [];
+        var image;
 
         if ( img.length ) {
 
@@ -93,21 +97,38 @@ Webpage.prototype.parseHTML = function( html, clbk, options, utils ) {
                 var h = img[i].attribs['height'] || 1;
                 img[i].surface = w * h;
 
+                img[i].score = _this._score( img[i] );
+
+                //Filter by size
+                if ( img[i].surface > MINIMUM_SURFACE ) {
+                    images.push( img[i] );
+                }
+
             }
 
-            //Sort by surface
-            img = img.sort( function( a, b ){
-                return b.surface - a.surface;
-            } );
+            if ( images.length > 0 ) {
+                //Sort by score
+                images.sort(function(a,b){
+                    if ( a.surface == b.surface ) {
+                        return b.score - a.score;
+                    } else {
+                        return b.surface - a.surface;
+                    }
+                });
+                image = images[0].attribs['src'];
 
-            //@TODO Score images and sort
+                //Resolve relative url
+                if (!image.match(/^http/)) {
+                    image = URL.resolve( url, image);
+                }
 
-            clbk( img[0].attribs['src'] );
-            return;
-
+                clbk( image );
+                return;
+            }
         }
 
         clbk(null);
+        return;
     } );
     var parser = new htmlparser.Parser( handler );
     parser.write( html );
