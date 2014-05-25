@@ -4,8 +4,11 @@ var source = require('vinyl-source-stream');
 
 gulp.task('browserify', function() {
     return browserify(['./src/ImageResolver.js'])
-        .bundle({'standalone':'ImageResolver'})
-        .pipe(source('ImageResolver.min.js'))
+        .bundle({
+            'standalone':'ImageResolver',
+            debug: false
+        })
+        .pipe(source('ImageResolver.js'))
         .pipe(gulp.dest('./dist/'));
 });
 

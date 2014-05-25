@@ -35,7 +35,7 @@ npm install image-resolver
 In a browser:
 
 ```
-&lt;script src="dist/ImageResolver.min.js" type="text/javascript">&lt;/script>
+<script src="dist/ImageResolver.js" type="text/javascript"></script>
 ```
 
 How to use
