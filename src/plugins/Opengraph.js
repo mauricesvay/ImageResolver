@@ -110,12 +110,16 @@ Opengraph.prototype.parseHTML = function( html, url, clbk, options, utils ) {
             image = images[0].url;
         }
 
-        //Resolve relative url
-        if (image && !image.match(/^http/)) {
-            image = URL.resolve( url, image);
+        if ( image ) {
+            //Resolve relative url
+            if (!image.match(/^http/)) {
+                image = URL.resolve( url, image);
+            }
+            clbk(image);
+        } else {
+            clbk(null);
         }
 
-        clbk(image);
     } );
     var parser = new htmlparser.Parser( handler );
     parser.write( html );
