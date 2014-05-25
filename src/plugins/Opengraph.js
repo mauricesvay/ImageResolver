@@ -3,8 +3,8 @@
  */
 
 var htmlparser = require("htmlparser2");
+var URL = require('url');
 
-// @TODO : add <link rel="image_src" href="http://www.example.com/facebook-logo.jpg" />
 var tags = [
     // Facebook, Google+
     {
@@ -44,7 +44,7 @@ Opengraph.prototype.resolve = function(url, clbk, options, utils) {
     utils.fetch(
         url,
         function onSuccess( data, response ) {
-            self.parseHTML( data, clbk, options, utils );
+            self.parseHTML( data, url, clbk, options, utils );
         },
         function onError(){
             clbk(null);
@@ -52,7 +52,7 @@ Opengraph.prototype.resolve = function(url, clbk, options, utils) {
     );
 };
 
-Opengraph.prototype.parseHTML = function( html, clbk, options, utils ) {
+Opengraph.prototype.parseHTML = function( html, url, clbk, options, utils ) {
     var domutils = htmlparser.DomUtils;
 
     var handler = new htmlparser.DomHandler( function( error, dom ) {
@@ -111,7 +111,9 @@ Opengraph.prototype.parseHTML = function( html, clbk, options, utils ) {
         }
 
         //Resolve relative url
-        // @TODO
+        if (image && !image.match(/^http/)) {
+            image = URL.resolve( url, image);
+        }
 
         clbk(image);
     } );
