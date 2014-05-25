@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/mauricesvay/ImageResolver",
   "devDependencies": {
-    "browserify": "^3.46.0",
+    "browserify": "^3.46.1",
     "gulp": "^3.6.2",
     "vinyl-source-stream": "^0.1.1"
   },
