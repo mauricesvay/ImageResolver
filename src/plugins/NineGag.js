@@ -20,8 +20,9 @@ NineGag.prototype.resolve = function(url, clbk) {
         id = matches[1];
         clbk( OUT_TPL.replace('{{id}}', id ) );
         return;
+    } else {
+        clbk(null);
     }
-    clbk(null);
 };
 
 module.exports = NineGag;

@@ -2,7 +2,7 @@ var ImageResolver = require('../../../src/ImageResolver');
 var imageresolver = new ImageResolver();
 imageresolver.register(new ImageResolver.ImgurAlbum());
 
-describe("ImgurAlbum : abum", function(){
+describe("ImgurAlbum : album", function(){
     it("should return the image URL", function(){
         var result;
         imageresolver.resolve(

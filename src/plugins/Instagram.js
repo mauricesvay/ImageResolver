@@ -13,8 +13,9 @@ Instagram.prototype.resolve = function(url, clbk) {
         url = OUT_TPL.replace('{{id}}', id[3]);
         clbk(url);
         return;
+    } else {
+        clbk(null);
     }
-    clbk(null);
 };
 
 module.exports = Instagram;

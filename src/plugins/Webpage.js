@@ -125,10 +125,11 @@ Webpage.prototype.parseHTML = function( html, url, clbk, options, utils ) {
                 clbk( image );
                 return;
             }
+        } else {
+            clbk(null);
+            return;
         }
 
-        clbk(null);
-        return;
     } );
     var parser = new htmlparser.Parser( handler );
     parser.write( html );
