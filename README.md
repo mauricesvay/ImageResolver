@@ -38,6 +38,18 @@ The API might break in the future.
     ImageResolver.resolve(url, callback);
     </script>
 
+If you already have access to the DOM of the page you can call directResolve, thus avoiding the extra GET request for the html code neccesary in some of the plugins. Furthermore, this gives a direct result without needing any callback. Note that this won't work in plugins requiring more ajax calls than the original html fetch.
+
+    <script src="URI.min.js" type="text/javascript"></script>
+    <script src="ImageResolver.js" type="text/javascript"></script>
+    <script>
+    ImageResolver.register(new FileExtensionResolver());
+    ImageResolver.register(new ImgurPageResolver());
+    ImageResolver.register(new NineGagResolver());
+    ImageResolver.register(new InstagramResolver());
+    ImageResolver.resolve(url, document);
+    </script>
+
 
 Dependencies
 ------------

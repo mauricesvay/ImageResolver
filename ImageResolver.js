@@ -53,10 +53,30 @@ window.ImageResolver = (function(){
         clbk(null);
     };
 
+    ImageResolver.prototype.iterateFilters = function(filters, url, dom){
+        if (filters.length){
+            var result;
+            for (var i = 0; i < filters.length; i++){
+                result = filters[i].directResolve(url, dom);
+                if (result !== null){
+                    return result;
+                }
+            }
+            return null;
+        } else {
+            return null;
+        }
+    };
+
     ImageResolver.prototype.resolve = function(url, clbk) {
         var filters = this.filters;
         this.next(filters, url, clbk);
         return this;
+    };
+
+    ImageResolver.prototype.directResolve = function(url, dom) {
+        var filters = this.filters;
+        return this.iterateFilters(filters, url, dom);
     };
 
     return new ImageResolver();
@@ -65,6 +85,8 @@ window.ImageResolver = (function(){
 
 /**
  * Plugins
+ *
+ * NOTE THAT NOT ALL OF THEM HAVE DIRECT RESOLUTION
  */
 
 /**
@@ -82,6 +104,14 @@ FileExtensionResolver.prototype.resolve = function(url, clbk) {
     clbk(null);
 };
 
+FileExtensionResolver.prototype.directResolve = function(url, dom) {
+    var pathname = URI(url).pathname();
+    if (pathname.match(/(png|jpg|jpeg|gif|bmp|svg)$/i)) {
+        return url;
+    }
+    return null;
+};
+
 /**
  * Imgur page
  */
@@ -94,6 +124,14 @@ ImgurPageResolver.prototype.resolve = function(url, clbk) {
         return;
     }
     clbk(null);
+};
+
+ImgurPageResolver.prototype.directResolve = function(url, dom) {
+    var matches = url.match(/http:\/\/(i\.)*imgur.com\/(gallery\/){0,1}(.*)/);
+    if (matches && matches.length && (-1 === matches[matches.length-1].indexOf('/'))) {
+        return 'http://i.imgur.com/' + matches[matches.length-1] + '.jpg' ; //@FIXME : image can be gif or png
+    }
+    return null;
 };
 
 /**
@@ -148,6 +186,18 @@ NineGagResolver.prototype.resolve = function(url, clbk) {
     clbk(null);
 };
 
+NineGagResolver.prototype.directResolve = function(url, dom) {
+    var matches = url.match(/http:\/\/9gag.com\/gag\/(.*)/) || [];
+    var id;
+    var image;
+    if (matches.length) {
+        id = matches[1];
+        image = 'http://d24w6bsrhbeh9d.cloudfront.net/photo/' + id + '_700b.jpg';
+        return image;
+    }
+    return null;
+};
+
 /**
  * Instagram page
  */
@@ -162,6 +212,17 @@ InstagramResolver.prototype.resolve = function(url, clbk) {
     }
     clbk(null);
 };
+
+InstagramResolver.prototype.directResolve = function(url, dom) {
+    var id = url.match(/http:\/\/instagr(\.am|am\.com)\/p\/([^\/]+)/);
+    if (id && id.length > 1) {
+        url = 'http://instagram.com/p/' + id[2] + '/media/?size=l';
+        return url;
+    }
+    return null;
+};
+
+
 
 /**
  * Flickr photo page
@@ -292,96 +353,100 @@ WebpageResolver.prototype._score = function(image) {
 
     return score;
 };
+
+
+WebpageResolver.prototype._resolveImageLazily = function(url, html) {
+    var images = html.match(/<img([^>]*)>/g) || [];
+    var image;
+    var candidates = [];
+    var significant_surface = 16*16;
+    var significant_surface_count = 0;
+    var tag;
+    var src;
+    var surface;
+    for (var i=0,l=images.length; i<l; i++) {
+        surface = 0;
+        tag = this._parseTag(images[i]);
+        if (tag && tag.attributes){
+
+            //Check for lazy loaded images
+            if (tag.attributes.src) {
+                src = tag.attributes.src;
+            }
+            if (tag.attributes['data-src']) {
+                src = tag.attributes['data-src'];
+            }
+            if (tag.attributes['data-lazy-src']) {
+                src = tag.attributes['data-lazy-src'];
+            }
+            if (!src){
+                continue;
+            }
+
+            // Compute surface area, even when only 1 dimension is specified
+            if (tag.attributes.width) {
+                if (tag.attributes.height) {
+                    surface = parseInt(tag.attributes.width, 10) * parseInt(tag.attributes.height,10);
+                } else {
+                    surface = parseInt(tag.attributes.width, 10);
+                }
+            } else {
+                if (tag.attributes.height) {
+                    surface = parseInt(tag.attributes.height,10);
+                } else {
+                    surface = 0;
+                }
+            }
+            if (surface > significant_surface) {
+                significant_surface_count++;
+            }
+
+            candidates.push({
+                url: src,
+                surface: surface,
+                score: this._score(tag)
+            });
+        }
+    }
+
+    if (!candidates.length) {
+        return null
+    }
+
+    //Remove scores below 0
+    candidates = candidates.filter(function(item){
+        return (item.score >= 0);
+    });
+    if (!candidates.length) {
+	return null;
+    }
+
+    //Sort candidates by size, or score
+    if (significant_surface_count > 0) {
+        candidates = candidates.sort(function(a,b){
+            return b.surface - a.surface;
+        });
+    } else {
+        candidates = candidates.sort(function(a,b){
+            return b.score - a.score;
+        });
+    }
+    image = candidates[0].url;
+    //Resolve relative url
+    if (!image.match(/^http/)) {
+        var uri = new URI(image);
+        image = uri.absoluteTo(url);
+    }
+
+    return image;
+};
+
 WebpageResolver.prototype.resolve = function(url, clbk) {
-    var self = this;
+    self = this;
     ImageResolver.fetch(
         url,
         function(html) {
-            var images = html.match(/<img([^>]*)>/g) || [];
-            var image;
-            var candidates = [];
-            var significant_surface = 16*16;
-            var significant_surface_count = 0;
-            var tag;
-            var src;
-            var surface;
-            for (var i=0,l=images.length; i<l; i++) {
-                surface = 0;
-                tag = self._parseTag(images[i]);
-                if (tag && tag.attributes){
-
-                    //Check for lazy loaded images
-                    if (tag.attributes.src) {
-                        src = tag.attributes.src;
-                    }
-                    if (tag.attributes['data-src']) {
-                        src = tag.attributes['data-src'];
-                    }
-                    if (tag.attributes['data-lazy-src']) {
-                        src = tag.attributes['data-lazy-src'];
-                    }
-                    if (!src){
-                        continue;
-                    }
-
-                    // Compute surface area, even when only 1 dimension is specified
-                    if (tag.attributes.width) {
-                        if (tag.attributes.height) {
-                            surface = parseInt(tag.attributes.width, 10) * parseInt(tag.attributes.height,10);
-                        } else {
-                            surface = parseInt(tag.attributes.width, 10);
-                        }
-                    } else {
-                        if (tag.attributes.height) {
-                            surface = parseInt(tag.attributes.height,10);
-                        } else {
-                            surface = 0;
-                        }
-                    }
-                    if (surface > significant_surface) {
-                        significant_surface_count++;
-                    }
-
-                    candidates.push({
-                        url: src,
-                        surface: surface,
-                        score: self._score(tag)
-                    });
-                }
-            }
-
-            if (!candidates.length) {
-                clbk(null);
-                return;
-            }
-
-            //Remove scores below 0
-            candidates = candidates.filter(function(item){
-                return (item.score >= 0);
-            });
-            if (!candidates.length) {
-                clbk(null);
-                return;
-            }
-
-            //Sort candidates by size, or score
-            if (significant_surface_count > 0) {
-                candidates = candidates.sort(function(a,b){
-                    return b.surface - a.surface;
-                });
-            } else {
-                candidates = candidates.sort(function(a,b){
-                    return b.score - a.score;
-                });
-            }
-            image = candidates[0].url;
-            //Resolve relative url
-            if (!image.match(/^http/)) {
-                var uri = new URI(image);
-                image = uri.absoluteTo(url);
-            }
-
-            clbk(image);
+            clbk(self._resolveImageLazily(url, html));
             return;
         },
         function() {
@@ -391,97 +456,107 @@ WebpageResolver.prototype.resolve = function(url, clbk) {
     );
 };
 
+WebpageResolver.prototype.directResolve = function(url, dom) {
+    return this._resolveImageLazily(url, dom.documentElement.innerHTML)
+};
+
+
 /**
  * Opengraph meta tags
  */
 function OpengraphResolver() {
 }
+
+OpengraphResolver.prototype._resolveImage = function(url, html){
+    // @TODO : add <link rel="image_src" href="http://www.example.com/facebook-logo.jpg" />
+    var meta = html.match(/<(meta|link)([^>]*)>/g) || [];
+    var tag;
+    var images = [];
+    var image = null;
+    var tags = [
+        // Facebook, Google+
+        {
+            type: "facebook",
+            attribute : "property",
+            name : "og:image",
+            value : "content"
+        },
+        // Old Facebook
+        {
+            type: "facebook",
+            attribute : "rel",
+            name : "image_src",
+            value : "href"
+        },
+        // Old Twitter card
+        {
+            type: "twitter",
+            attribute : "name",
+            name : "twitter:image",
+            value : "value"
+        },
+        // New Twitter card
+        {
+            type: "twitter",
+            attribute : "name",
+            name : "twitter:image",
+            value : "content"
+        }
+    ];
+
+    for (var i=0,l=meta.length; i<l; i++) {
+        //@FIXME: remove dependency on WebpageResolver
+        tag = WebpageResolver.prototype._parseTag(meta[i]);
+        if (tag) {
+            for (var j=0, m=tags.length; j<m; j++) {
+                if (
+                    tag.attributes[tags[j].attribute] &&
+                        tag.attributes[tags[j].attribute] === tags[j].name &&
+                        tag.attributes[tags[j].value]
+                    ) {
+                    images.push({
+                        url: tag.attributes[tags[j].value],
+                        type: tags[j].type,
+                        score: 0
+                    });
+                }
+            }
+        }
+    }
+    if (images.length === 1) {
+        image = images[0].url;
+    } else if (images.length > 1) {
+        for (i=0, l=images.length; i<l; i++) {
+            //Increase score for image containing "large" or "big" in url
+            if (images[i].url.match(/(large|big)/i)) {
+                images[i].score++;
+            }
+            // Increase score for twitter
+            if (images[i].type === 'twitter') {
+                images[i].score++;
+            }
+        }
+        images.sort(function(a,b){
+            return b.score - a.score;
+        });
+        image = images[0].url;
+    }
+
+    //Resolve relative url
+    if (image && !image.match(/^http/)) {
+        var uri = new URI(image);
+        image = uri.absoluteTo(url);
+    }
+
+    return image;
+};
+
 OpengraphResolver.prototype.resolve = function(url, clbk) {
-    var self = this;
+    self = this;
     ImageResolver.fetch(
         url,
         function(html) {
-            // @TODO : add <link rel="image_src" href="http://www.example.com/facebook-logo.jpg" />
-            var meta = html.match(/<(meta|link)([^>]*)>/g) || [];
-            var tag;
-            var images = [];
-            var image = null;
-            var tags = [
-                // Facebook, Google+
-                {
-                    type: "facebook",
-                    attribute : "property",
-                    name : "og:image",
-                    value : "content"
-                },
-                // Old Facebook
-                {
-                    type: "facebook",
-                    attribute : "rel",
-                    name : "image_src",
-                    value : "href"
-                },
-                // Old Twitter card
-                {
-                    type: "twitter",
-                    attribute : "name",
-                    name : "twitter:image",
-                    value : "value"
-                },
-                // New Twitter card
-                {
-                    type: "twitter",
-                    attribute : "name",
-                    name : "twitter:image",
-                    value : "content"
-                }
-            ];
-
-            for (var i=0,l=meta.length; i<l; i++) {
-                //@FIXME: remove dependency on WebpageResolver
-                tag = WebpageResolver.prototype._parseTag(meta[i]);
-                if (tag) {
-                    for (var j=0, m=tags.length; j<m; j++) {
-                        if (
-                            tag.attributes[tags[j].attribute] &&
-                            tag.attributes[tags[j].attribute] === tags[j].name &&
-                            tag.attributes[tags[j].value]
-                        ) {
-                            images.push({
-                                url: tag.attributes[tags[j].value],
-                                type: tags[j].type,
-                                score: 0
-                            });
-                        }
-                    }
-                }
-            }
-            if (images.length === 1) {
-                image = images[0].url;
-            } else if (images.length > 1) {
-                for (i=0, l=images.length; i<l; i++) {
-                    //Increase score for image containing "large" or "big" in url
-                    if (images[i].url.match(/(large|big)/i)) {
-                        images[i].score++;
-                    }
-                    // Increase score for twitter
-                    if (images[i].type === 'twitter') {
-                        images[i].score++;
-                    }
-                }
-                images.sort(function(a,b){
-                    return b.score - a.score;
-                });
-                image = images[0].url;
-            }
-
-            //Resolve relative url
-            if (image && !image.match(/^http/)) {
-                var uri = new URI(image);
-                image = uri.absoluteTo(url);
-            }
-
-            clbk(image);
+            clbk(self._resolveImage(url, html));
             return;
         },
         function() {
@@ -489,4 +564,8 @@ OpengraphResolver.prototype.resolve = function(url, clbk) {
             return;
         }
     );
+};
+
+OpengraphResolver.prototype.directResolve = function(url, dom) {
+    return this._resolveImage(url, dom.documentElement.innerHTML);
 };
