@@ -1,6 +1,6 @@
 {
-  "name": "ImageResolver",
-  "version": "0.0.1",
+  "name": "image-resolver",
+  "version": "0.5",
   "description": "Extract main image for a given URL",
   "main": "src/ImageResolver.js",
   "directories": {

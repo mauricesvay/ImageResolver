@@ -2,87 +2,121 @@ ImageResolver.js
 ================
 
 ImageResolver.js is a library that extracts the main image of a URL while saving resources.
-Instead of loading all images of a URL, it will try to guess the main image from the URL or the page HTML.
-
+Instead of loading all images of a URL, it will try to guess the main image from the URL or the webpage.
 It's like Readability for images.
 
 **Demo** : [http://mauricesvay.github.com/ImageResolver/](http://mauricesvay.github.com/ImageResolver/)
 
-Works without any extra request with:
+ImageResolver works in browsers and Node.js.
 
-* image URLs
-* imgur.com photo pages
-* 9gag
-* Instagram
+To detect images, ImageResolver comes with built-in plugins:
 
-Works with an additional request:
+* FileExtension: use file extension in urls
+* ImgurPage: extract image from imgur.com urls
+* NineGag: extract image from 9gag.com urls
+* Instagram: extract image from instagram.com urls
+* MimeType: use MIME type to detect images
+* ImgurAlbum: extract image from imgur.com albums
+* Flickr: extract image from Flickr urls (requires API key)
+* Opengraph: use opengraph meta to extract image
+* Webpage: parse HTML to extract image
 
-* imgur.com album pages
-* flickr.com photo pages (requires an API key)
-* any other webpage with Opengraph tags (requires a proxy)
-* any other webpage by looking at `<img>` tags (requires a proxy)
+Of course, you can create your own plugins.
 
-ImageResolvers.js compatibility can be extended to more sites by writing plugins.
+How to install
+--------------
 
-Usage
------
-The API might break in the future.
+In Node.js:
 
-    <script src="URI.min.js" type="text/javascript"></script>
-    <script src="ImageResolver.js" type="text/javascript"></script>
-    <script>
-    ImageResolver.register(new FileExtensionResolver());
-    ImageResolver.register(new ImgurPageResolver());
-    ImageResolver.register(new NineGagResolver());
-    ImageResolver.register(new InstagramResolver());
-    ImageResolver.resolve(url, callback);
-    </script>
+```
+npm install image-resolver
+```
+
+In a browser:
+
+```
+&lt;script src="dist/ImageResolver.min.js" type="text/javascript">&lt;/script>
+```
+
+How to use
+----------
+
+```
+var resolver = new ImageResolver();
+resolver.register(new ImageResolver.FileExtension());
+resolver.register(new ImageResolver.MimeType());
+resolver.register(new ImageResolver.Opengraph());
+resolver.register(new ImageResolver.Webpage());
+
+resolver.resolve( "http://example.com/", function( result ){
+    if ( result ) {
+        console.log( result.image );
+    } else {
+        console.log( "No image found at " + result.url );
+    }
+});
+```
+
+API
+---
+
+### ImageResolver( [options] )
+
+Create a new instance of ImageResolver
+
+### ImageResolver.register( plugin )
+
+Register the given plugin for resolving images.
+You must register at least one plugin.
+Plugins are executed in the order of their registration.
+
+### ImageResolver.resolve( url, callback )
+
+Extract main image from given url. Callback will be called with `null` when
+no image is found, or an object when the image is found.
 
 
-Dependencies
-------------
-I'm working to reduce dependencies, but for now you need:
+How to write your own plugin
+----------------------------
 
-* jQuery
-* URI.js
+To create a plugin, create an object that has `resolve` method.
+The `resolve` method must have this signature:
 
-Why it's hard
--------------
-* Website do not set width or height for images
-* Images can be lazy loaded
-* Pages can be without any image
-* Pages are full of ads, transparent gif, tracking pixels, banners
-* Images are displayed as CSS backgrounds instead of <img>
-* Websites provide a logo as opengraph/twitter cards images instead of actual images
-* Flash, iframes and other embedded content
-* Javascript generated DOM
-* Servers prevent leeching by returning 403 or altered images
-* HTTP redirections, HTML redirections
-* Authentication
-* Image URLs can be relative to host or protocol
+```
+function( url, clbk, options, utils ) {
+    ...
+}
+```
 
-License
--------
+* url : url to resolve
+* clbk : callback
+* options : ImageResolver options
+* utils : util functions
 
-This app is under the BSD license:
+When your plugin has found an image, you must call `clbk` with the image as
+parameter:
 
-    Copyright (c) 2012, Maurice Svay All rights reserved.
+```
+clbk( image_url );
+```
 
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+If your plugin can not find an image, you must call `clbk` with null as
+parameter
 
-    Redistributions of source code must retain the above copyright notice, this
-    list of conditions and the following disclaimer. Redistributions in binary
-    form must reproduce the above copyright notice, this list of conditions and
-    the following disclaimer in the documentation and/or other materials
-    provided with the distribution. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
-    HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-    FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
-    OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+clbk( null );
+```
+
+If your plugin needs to make HTTP GET requests, it is recommended to use
+`utils.fetch`. This function lets you make GET requests, works in browsers and Node.js,
+and the result will be cached and shared between plugins.
+
+If you need more control over HTTP requests, you can use `utils.request` that
+gives you access to the raw superagent library.
+
+Compiling the browser lib
+-------------------------
+
+* `npm install`
+* `npm install -g gulp`
+* `gulp` to build the browser lib
