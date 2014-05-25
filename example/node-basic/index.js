@@ -1,10 +1,15 @@
 var ImageResolver = require('../../src/ImageResolver');
 
-var imageresolver = new ImageResolver();
-imageresolver.register(new ImageResolver.FileExtension());
-imageresolver.register(new ImageResolver.Opengraph());
-imageresolver.register(new ImageResolver.Webpage());
+var resolver = new ImageResolver();
+resolver.register(new ImageResolver.FileExtension());
+resolver.register(new ImageResolver.MimeType());
+resolver.register(new ImageResolver.Opengraph());
+resolver.register(new ImageResolver.Webpage());
 
-imageresolver.resolve('http://www.imdb.com/title/tt2294629/', function(result){
-    console.log('result',result);
+resolver.resolve( 'http://www.imdb.com/title/tt2294629/', function( result ){
+    if ( result ) {
+        console.log( result.image );
+    } else {
+        console.log( 'No image found at ' + result.url );
+    }
 });
