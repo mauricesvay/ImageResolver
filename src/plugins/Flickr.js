@@ -35,9 +35,10 @@ Flickr.prototype.resolve = function(url, clbk, options, utils) {
                 clbk(null);
                 return;
             } );
+    } else {
+        clbk(null);
+        return;
     }
-    clbk(null);
-    return;
 };
 
 module.exports = Flickr;
