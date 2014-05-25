@@ -52,7 +52,7 @@ resolver.resolve( "http://example.com/", function( result ){
     if ( result ) {
         console.log( result.image );
     } else {
-        console.log( "No image found at " + result.url );
+        console.log( "No image found" );
     }
 });
 ```

@@ -10,6 +10,6 @@ resolver.resolve( 'http://www.imdb.com/title/tt2294629/', function( result ){
     if ( result ) {
         console.log( result.image );
     } else {
-        console.log( 'No image found at ' + result.url );
+        console.log( 'No image found ' );
     }
 });
