@@ -5,6 +5,7 @@ var NineGag       = require('./plugins/NineGag');
 var Instagram     = require('./plugins/Instagram');
 var ImgurPage     = require('./plugins/ImgurPage');
 
+var ImgurAlbum    = require('./plugins/ImgurAlbum');
 var Flickr        = require('./plugins/Flickr');
 var MimeType      = require('./plugins/MimeType');
 var Opengraph     = require('./plugins/Opengraph');
@@ -75,6 +76,7 @@ ImageResolver.Instagram     = Instagram;
 ImageResolver.ImgurPage     = ImgurPage;
 
 ImageResolver.MimeType      = MimeType;
+ImageResolver.ImgurAlbum    = ImgurAlbum;
 ImageResolver.Flickr        = Flickr;
 ImageResolver.Opengraph     = Opengraph;
 ImageResolver.Webpage       = Webpage;
