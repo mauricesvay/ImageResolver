@@ -10,6 +10,9 @@ MimeType.prototype.resolve = function( url, clbk, options, utils ) {
                 case "image/jpeg":
                 case "image/png":
                 case "image/gif":
+                case "image/svg+xml":
+                case "image/bmp":
+                case "image/tiff":
                     clbk(url);
                     break;
                 default:

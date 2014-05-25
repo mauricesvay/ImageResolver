@@ -55,3 +55,21 @@ describe("MimeType : gif", function(){
         });
     });
 });
+
+describe("MimeType : svg", function(){
+    it("should return the svg URL as is", function(){
+        var result;
+        imageresolver.resolve(
+            "http://upload.wikimedia.org/wikipedia/commons/f/fd/Ghostscript_Tiger.svg",
+            function(res){
+                result = res;
+            }
+        );
+        waitsFor(function(){
+            return result;
+        }, 10000);
+        runs(function(){
+            expect(result.image).toBe("http://upload.wikimedia.org/wikipedia/commons/f/fd/Ghostscript_Tiger.svg");
+        });
+    });
+});
