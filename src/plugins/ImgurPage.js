@@ -2,7 +2,7 @@
  * Imgur page
  */
 
-var VALID_URL = /http(s*):\/\/(i\.)*imgur.com\/(gallery\/){0,1}(.*)/;
+var VALID_URL = /http(s*):\/\/(i\.|m\.)*imgur.com\/(gallery\/){0,1}(.*)/;
 var OUT_TPL = 'http://i.imgur.com/{{id}}.jpg'; //@FIXME : image can be gif or png
 
 function ImgurPage() {
