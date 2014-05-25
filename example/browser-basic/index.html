@@ -82,11 +82,12 @@
 
 <script>
 
-function proxify( url ) {
-    return "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent( url );
+function proxify( request ) {
+    request.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent( request.url );
+    return request;
 }
 
-var resolver = new ImageResolver();
+var resolver = new ImageResolver( { requestPlugin : proxify } );
 
 //The ImageResolver will try all the resolvers one after the other
 //in the order of their registration
@@ -105,7 +106,7 @@ $(function(){
         e.preventDefault();
         $("#url").addClass('loading');
         var url = $('#url').val();
-        resolver.resolve( proxify(url), function( result ){
+        resolver.resolve( url, function( result ){
             console.log( result );
             if ( result ) {
                 $('#result').html('<code>' + result.image + '</code><br><img src="' + result.image + '" alt="">');

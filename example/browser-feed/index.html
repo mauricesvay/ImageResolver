@@ -49,12 +49,13 @@ $.ajaxPrefilter('text', function(options) {
     options.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(options.url);
 });
 
-function proxify(url) {
-    return "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent(url);
+function proxify( request ) {
+    request.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent( request.url );
+    return request;
 }
 
 // Initialize ImageResolver
-var resolver = new ImageResolver();
+var resolver = new ImageResolver( { requestPlugin : proxify } );
 resolver.register(new ImageResolver.FileExtension());
 resolver.register(new ImageResolver.NineGag());
 resolver.register(new ImageResolver.Instagram());
@@ -111,7 +112,7 @@ function parseFeed(data, status, jqxhr) {
         if (links && links.length) {
             link = links[0];
             (function(link, title) {
-                resolver.resolve(proxify(link), function(image){
+                resolver.resolve(link, function(image){
                     displayItem(link, title, image);
                 });
             })(link, item.title);

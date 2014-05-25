@@ -8,25 +8,32 @@ var Utils = function( options ){
 Utils.prototype.fetch = function( url, success, error ) {
 
     var _this = this;
+    var plugin = null;
+
+    if ( this.options.requestPlugin && typeof this.options.requestPlugin === 'function' ) {
+        plugin = this.options.requestPlugin;
+    }
 
     if (url in this.cache) {
         success( this.cache[url].data, this.cache[url].response );
     } else {
-        request.get( url , function( response ) {
 
-            if ( response.ok ) {
+        var r = request.get( url );
+        if ( plugin ) {
+            r = r.use( plugin );
+        }
+        r.end( function( err, response ) {
 
-                _this.cache[url] = {
-                    data: response.text,
-                    response: response
-                }
-                success( response.text, response );
-
-            } else {
-
-                error( response );
-
+            if ( err ) {
+                error();
+                return;
             }
+
+            _this.cache[url] = {
+                data: response.text,
+                response: response
+            }
+            success( response.text, response );
 
         });
     }
