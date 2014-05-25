@@ -5,6 +5,6 @@ imageresolver.register(new ImageResolver.FileExtension());
 imageresolver.register(new ImageResolver.Opengraph());
 imageresolver.register(new ImageResolver.Webpage());
 
-imageresolver.resolve('https://medium.com/life-learning/2a1841f1335d', function(result){
+imageresolver.resolve('http://www.imdb.com/title/tt2294629/', function(result){
     console.log('result',result);
 });
