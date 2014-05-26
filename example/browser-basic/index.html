@@ -5,123 +5,85 @@
     <title>ImageResolver</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
     <script src="../../dist/ImageResolver.0.5.1.js" type="text/javascript"></script>
-    <style>
-    body {
-        font-family: Helvetica, Arial, sans-serif;
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="example.css">
+
+    <script>
+
+    // HTTP Request to other domain are blocked
+    // We need a CORS proxy
+    function proxify( request ) {
+        request.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent( request.url );
+        return request;
     }
-    form {
-        text-align: center;
-        padding: 2em;
-    }
-    div {
-        padding: 1em;
-        text-align: center;
-    }
-    .loading {
-        background: #C5E2ED;
-    }
-    .examples {
-        text-align: center;
-    }
-    .examples li {
-        list-style: none;
-        display: inline;
-        margin: 0 1ex;
-    }
-    </style>
+
+    // Create an instance of ImageResolver
+    // The proxy function is passed as an option
+    var resolver = new ImageResolver( { requestPlugin : proxify } );
+
+    // Register plugins we want to use
+    // You can use the built-in plugin, or create your own
+    // Plugins will be called in the order of their registration
+    resolver.register(new ImageResolver.FileExtension());
+    resolver.register(new ImageResolver.NineGag());
+    resolver.register(new ImageResolver.Instagram());
+    resolver.register(new ImageResolver.ImgurPage());
+
+    resolver.register(new ImageResolver.MimeType());
+    resolver.register(new ImageResolver.Flickr( '6a4f9b6d16c0eaced089c91a2e7e87ad' ));
+    resolver.register(new ImageResolver.Opengraph());
+    resolver.register(new ImageResolver.Webpage());
+
+    $(function(){
+        $('form').on('submit', function(e){
+            e.preventDefault();
+            $("#url").addClass('loading');
+            var url = $('#url').val();
+
+            resolver.resolve( url, function( result ){
+                console.log( result );
+                if ( result ) {
+                    $('body').css('background-image', 'url(' + result.image + ')');
+                } else {
+                    alert('Can not find image');
+                }
+                $("#url").removeClass('loading');
+            });
+
+        });
+
+        $('.examples a').on('click', function(e){
+            e.preventDefault();
+            $("#url").val($(this).attr('href'));
+            $('form').trigger('submit');
+        })
+    });
+    </script>
 </head>
 <body>
 <form>
-    <label for="url">Type an URL:</label>
-    <input type="text" value="" placeholder="http://" name="url" id="url" size="50">
-    <button type="submit">Find main image</button>
+    <fieldset>
+        <label for="url">Enter an URL:</label>
+        <input type="text" value="" placeholder="http://" name="url" id="url" size="50">
+        <button type="submit">Extract image</button>
+    </fieldset>
+
     <ul class="examples">
-        <li>Examples:</li>
-        <li>
-            <a href="http://ndevilla.free.fr/lena/lena.jpg">
-                image URL
-            </a>
-        </li>
-        <li>
-            <a href="http://imgur.com/kGKMw">
-                imgur.com
-            </a>
-        </li>
-        <li>
-            <a href="http://9gag.com/gag/4760092">
-                9gag.com
-            </a>
-        </li>
-        <li>
-            <a href="http://www.flickr.com/photos/48202796@N05/7543031692/">
-                flickr.com
-            </a>
-        </li>
-        <li>
-            <a href="http://www.apple.com/">
-                apple.com
-            </a>
-        </li>
-        <li>
-            <a href="http://www.theverge.com/apple/2011/10/12/2484524/iphone-4s-review">
-                theverge.com
-            </a>
-        </li>
-        <li>
-            <a href="http://mobile.smashingmagazine.com/2012/07/12/elements-mobile-user-experience/">
-                smashingmagazine.com
-            </a>
-        </li>
+        <li>Try one of these examples:</li>
+        <li><a href="http://37.media.tumblr.com/d794bfd843e9a04489d17865a58ac700/tumblr_n3ttuxlKFr1st5lhmo1_1280.jpg">JPG url</a></li>
+        <li><a href="http://imgur.com/kGKMw">imgur.com</a></li>
+        <li><a href="http://9gag.com/gag/aG9grx0">9gag.com</a></li>
+        <li><a href="http://www.flickr.com/photos/48202796@N05/7543031692/">flickr.com</a></li>
+        <li><a href="http://instagram.com/p/InCRT/">instagram.com</a></li>
+        <li><a href="http://www.imdb.com/title/tt2294629/">imdb.com</a></li>
+        <li><a href="http://www.theverge.com/2014/5/20/5734090/transistor-review">theverge.com</a></li>
+        <li><a href="http://dribbble.com/shots/1568411-Pink-smoke">dribbble.com</a></li>
     </ul>
+
     <p>
-        More info: <a href="https://github.com/mauricesvay/ImageResolver">https://github.com/mauricesvay/ImageResolver</a>
+        ImageResolver is javascript library that extracts the main image from an URL.<br>
+        <a href="https://github.com/mauricesvay/ImageResolver">More on github</a>
     </p>
 </form>
-
-<div id="result"></div>
-
-<script>
-
-function proxify( request ) {
-    request.url = "http://www.inertie.org/ba-simple-proxy.php?mode=native&url=" + encodeURIComponent( request.url );
-    return request;
-}
-
-var resolver = new ImageResolver( { requestPlugin : proxify } );
-
-//The ImageResolver will try all the resolvers one after the other
-//in the order of their registration
-resolver.register(new ImageResolver.FileExtension());
-resolver.register(new ImageResolver.NineGag());
-resolver.register(new ImageResolver.Instagram());
-resolver.register(new ImageResolver.ImgurPage());
-
-resolver.register(new ImageResolver.MimeType());
-resolver.register(new ImageResolver.Flickr( '6a4f9b6d16c0eaced089c91a2e7e87ad' ));
-resolver.register(new ImageResolver.Opengraph());
-resolver.register(new ImageResolver.Webpage());
-
-$(function(){
-    $('form').on('submit', function(e){
-        e.preventDefault();
-        $("#url").addClass('loading');
-        var url = $('#url').val();
-        resolver.resolve( url, function( result ){
-            console.log( result );
-            if ( result ) {
-                $('#result').html('<code>' + result.image + '</code><br><img src="' + result.image + '" alt="">');
-            } else {
-                $('#result').html('<h2>No image found</h2>');
-            }
-            $("#url").removeClass('loading');
-        });
-    });
-    $('.examples a').on('click', function(e){
-        e.preventDefault();
-        $("#url").val($(this).attr('href'));
-        $('form').trigger('submit');
-    })
-});
-</script>
 </body>
 </html>
