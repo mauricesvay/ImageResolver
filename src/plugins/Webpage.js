@@ -3,6 +3,7 @@
  */
 
 var htmlparser = require("htmlparser2");
+var URL = require('url');
 
 var MINIMUM_SURFACE = 16 * 16;
 
