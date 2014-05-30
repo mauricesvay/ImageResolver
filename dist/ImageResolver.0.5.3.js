@@ -12052,6 +12052,8 @@ Webpage.prototype.parseHTML = function( html, url, clbk, options, utils ) {
 
                 clbk( image );
                 return;
+            } else {
+                clbk(null);
             }
         } else {
             clbk(null);
