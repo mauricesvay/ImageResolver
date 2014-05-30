@@ -19,3 +19,21 @@ describe("Webpage : IMDB", function(){
         });
     });
 });
+
+describe("Webpage : no image", function(){
+    it("should return the image URL", function(){
+        var result;
+        imageresolver.resolve(
+            "http://perdu.com/",
+            function(res){
+                result = ( res === null ) ? true : false;
+            }
+        );
+        waitsFor(function(){
+            return result;
+        }, 10000);
+        runs(function(){
+            expect(result).toBe(true);
+        });
+    });
+});
