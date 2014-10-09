@@ -93,6 +93,10 @@ Webpage.prototype.parseHTML = function( html, url, clbk, options, utils ) {
                     img[i].attribs['src'] = img[i].attribs['data-lazy-src'];
                 }
 
+                if ( !img[i].attribs['src'] ) {
+                    continue;
+                }
+
                 //Compute surface
                 var w = img[i].attribs['width'] || 1;
                 var h = img[i].attribs['height'] || 1;
