@@ -2,7 +2,7 @@
  * Flickr photo page
  */
 
-var API_URL = 'http://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key={{APIKEY}}&photo_id={{ID}}&format=json&nojsoncallback=1';
+var API_URL = 'https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key={{APIKEY}}&photo_id={{ID}}&format=json&nojsoncallback=1';
 
 function Flickr(apikey) {
     this.apikey = apikey;
