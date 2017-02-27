@@ -22,10 +22,11 @@ Utils.prototype.fetch = function( url, success, error ) {
         if ( plugin ) {
             r = r.use( plugin );
         }
+        r.on('error', error);
         r.end( function( err, response ) {
 
             if ( err ) {
-                error();
+                error(err);
                 return;
             }
 
