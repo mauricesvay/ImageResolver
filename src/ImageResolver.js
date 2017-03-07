@@ -11,6 +11,26 @@ var MimeType      = require('./plugins/MimeType');
 var Opengraph     = require('./plugins/Opengraph');
 var Webpage       = require('./plugins/Webpage');
 
+function ClbkInvoker (clbk, url) {
+  this.clbk = clbk;
+  this.url = url;
+}
+ClbkInvoker.prototype.invoke = function (image) {
+  if (!this.clbk) {
+    return;
+  }
+  if ( image ) {
+      this.clbk( {
+          'url': this.url,
+          'image': image
+      } );
+  } else {
+      this.clbk( null );
+  }
+  this.clbk = null;
+  this.url = null;
+};
+
 function ImageResolver( options ) {
 
     this.options = options;
@@ -26,23 +46,32 @@ ImageResolver.prototype.register = function(fn) {
 
 };
 
-ImageResolver.prototype.next = function(filters, url, clbk) {
+ImageResolver.prototype.onFilterResolve = function (url, clbk, index, data) {
 
-    var self = this;
-    var filter;
-    if (filters.length) {
-        filter = filters[0];
-        filter.resolve( url, function( data ){
-            if (data === null) {
-                self.next(filters.slice(1), url, clbk);
-                return;
-            } else {
-                clbk(data);
-                return;
-            }
-        }, this.options, this.utils );
+    if (data === null) {
+        this.next(url, clbk, index+1);
     } else {
-        clbk(null);
+        clbk.invoke(data);
+    }
+    url = null;
+    clbk = null;
+    index = null;
+
+};
+
+ImageResolver.prototype.next = function(url, clbk, index) {
+
+    var filter;
+    index = index || 0;
+    if (index >= this.filters.length) {
+      clbk.invoke(null);
+      return;
+    }
+    filter = this.filters[index];
+    if (filter) {
+        filter.resolve( url, this.onFilterResolve.bind(this, url, clbk, index), this.options, this.utils );
+    } else {
+        clbk.invoke(null);
         return;
     }
 
@@ -50,21 +79,7 @@ ImageResolver.prototype.next = function(filters, url, clbk) {
 
 ImageResolver.prototype.resolve = function(url, clbk) {
 
-    var callback = function( image ) {
-        if ( image ) {
-            clbk( {
-                'url': url,
-                'image': image
-            } );
-            return;
-        } else {
-            clbk( null );
-            return;
-        }
-    }
-
-    var filters = this.filters;
-    this.next(filters, url, callback);
+    this.next(url, new ClbkInvoker(clbk, url));
     return this;
 
 };
