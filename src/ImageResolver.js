@@ -52,10 +52,20 @@ ImageResolver.prototype.resolve = function(url, clbk) {
 
     var callback = function( image ) {
         if ( image ) {
-            clbk( {
-                'url': url,
-                'image': image
-            } );
+            var images = [];
+            if ( image.constructor === Array ) {
+                images = image.slice(1);
+                image = image[0];
+            }
+            if ( image ) {
+                clbk( {
+                    'url': url,
+                    'image': image,
+                    'images': images
+                } );
+            } else {
+                clbk( null );
+            }
             return;
         } else {
             clbk( null );
