@@ -15,7 +15,7 @@ describe("OpenGraph : IMDB", function(){
             return result;
         }, 10000);
         runs(function(){
-            expect(result.image).toBe("http://ia.media-imdb.com/images/M/MV5BMTQ1MjQwMTE5OF5BMl5BanBnXkFtZTgwNjk3MTcyMDE@._V1_SY1200_CR90,0,630,1200_AL_.jpg");
+            expect(result.image).toBe("http://ia.media-imdb.com/images/M/MV5BMTQ1MjQwMTE5OF5BMl5BanBnXkFtZTgwNjk3MTcyMDE@._V1_UY1200_CR90,0,630,1200_AL_.jpg");
         });
     });
 });
