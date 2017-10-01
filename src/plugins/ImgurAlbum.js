@@ -1,12 +1,20 @@
 /**
  * Imgur album
+ * See https://apidocs.imgur.com/
  */
 
 var VALID_URL = /http(s*):\/\/(i\.|m\.)*imgur.com\/a\/([^\/]*)/;
-var API_URL = 'http://api.imgur.com/2/album/{{ID}}.json';
+var API_URL = 'https://api.imgur.com/3/album/{{albumHash}}';
 
-function ImgurAlbum() {
+function ImgurAlbum(config) {
+
+    if (!config.client_id) {
+        throw new Error("ImgurAlbum plugin: client_id is missing");
+    }
+
+    this.config = config;
 }
+
 ImgurAlbum.prototype.resolve = function(url, clbk, options, utils) {
 
     var request = utils.request;
@@ -17,22 +25,19 @@ ImgurAlbum.prototype.resolve = function(url, clbk, options, utils) {
     if (matches && matches.length ) {
 
         id = matches[ matches.length - 1 ];
-        api = API_URL.replace('{{ID}}', id);
+        api = API_URL.replace('{{albumHash}}', id);
 
         request
             .get( api )
+            .set( "Authorization", "Client-ID " + this.config.client_id )
             .end( function( response ){
-                data = JSON.parse( response.text );
-                var images = data.album.images || [];
-
-                if (images.item && images.item.length) {
-                    images = images.item;
-                }
+                var data = response.body.data;
+                var images = data.images || [];
 
                 var first = images.shift();
 
                 if (first) {
-                    clbk(first.links.large_thumbnail);
+                    clbk(first.link);
                     return;
                 } else {
                     clbk(null);
