@@ -17,7 +17,7 @@ describe("Imgur : imgur page", function() {
         ImgurPage.resolve("http://imgur.com/kGKMw", function( res ){
             result = res;
         });
-        expect(result).toBe("http://i.imgur.com/kGKMw.jpg");
+        expect(result).toBe("https://i.imgur.com/kGKMw.jpg");
     });
 });
 
@@ -27,7 +27,7 @@ describe("Imgur : imgur mobile page", function() {
         ImgurPage.resolve("http://m.imgur.com/kGKMw", function( res ){
             result = res;
         });
-        expect(result).toBe("http://i.imgur.com/kGKMw.jpg");
+        expect(result).toBe("https://i.imgur.com/kGKMw.jpg");
     });
 });
 
@@ -37,7 +37,7 @@ describe("Imgur : imgur https page", function() {
         ImgurPage.resolve("https://imgur.com/kGKMw", function( res ){
             result = res;
         });
-        expect(result).toBe("http://i.imgur.com/kGKMw.jpg");
+        expect(result).toBe("https://i.imgur.com/kGKMw.jpg");
     });
 });
 
@@ -47,6 +47,6 @@ describe("Imgur : imgur page in gallery", function() {
         ImgurPage.resolve("http://imgur.com/gallery/PYdu6W7", function( res ){
             result = res;
         });
-        expect(result).toBe("http://i.imgur.com/PYdu6W7.jpg");
+        expect(result).toBe("https://i.imgur.com/PYdu6W7.jpg");
     });
 });
