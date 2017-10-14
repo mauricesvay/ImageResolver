@@ -5,9 +5,34 @@ var Utils = function( options ){
     this.cache = {};
 };
 
+Utils.prototype.ender = function(url, success, error, r, err, response){
+  if (r) {
+    r.removeListener('error', error);
+  }
+  if ( err ) {
+      error(err);
+      url = null;
+      success = null;
+      error = null;
+      r = null;
+      return;
+  }
+
+  if (!(this.options && this.options.nocache)) {
+    this.cache[url] = {
+        data: response.text,
+        response: response
+    }
+  }
+  success( response.text, response );
+  url = null;
+  success = null;
+  error = null;
+  r = null;
+};
+
 Utils.prototype.fetch = function( url, success, error ) {
 
-    var _this = this;
     var plugin = null;
 
     if ( this.options.requestPlugin && typeof this.options.requestPlugin === 'function' ) {
@@ -22,21 +47,11 @@ Utils.prototype.fetch = function( url, success, error ) {
         if ( plugin ) {
             r = r.use( plugin );
         }
+        if (this.options.timeout && 'object' === typeof this.options.timeout) {
+          r.timeout(this.options.timeout);
+        }
         r.on('error', error);
-        r.end( function( err, response ) {
-
-            if ( err ) {
-                error(err);
-                return;
-            }
-
-            _this.cache[url] = {
-                data: response.text,
-                response: response
-            }
-            success( response.text, response );
-
-        });
+        r.end(this.ender.bind(this, url, success, error, r));
     }
 };
 
