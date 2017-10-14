@@ -9,7 +9,7 @@ function Flickr(apikey) {
 }
 Flickr.prototype.resolve = function(url, clbk, options, utils) {
     var request = utils.request;
-    var matches = url.match(/http(s*):\/\/www.flickr.com\/photos\/([^\/]*)\/([^\/]*)\/(.*)/) || [];
+    var matches = url.match(/http(s?):\/\/www.flickr.com\/photos\/([^\/]*)\/(\d+)\b/) || [];
     var id;
     var image;
     var api;
